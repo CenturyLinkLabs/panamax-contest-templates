@@ -26,7 +26,7 @@ images:
   category: API
   type: Default
 - name: api
-  source: centurylink/socialize-api:latest
+  source: centurylink/noexist
   category: API
   type: Default
   ports:
