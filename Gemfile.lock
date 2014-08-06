@@ -1,0 +1,17 @@
+GIT
+  remote: https://github.com/CenturyLinkLabs/panamax-template-validator.git
+  revision: 4042d45ccbe0e0499cd527832f9aac868eb9a8e5
+  specs:
+    panamax_template_validator (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (10.3.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  panamax_template_validator!
+  rake
