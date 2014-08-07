@@ -5,7 +5,7 @@ task :default do
   `git remote add source https://github.com/CenturyLinkLabs/panamax-contest-templates.git`
   `git fetch source`
 
-  diff = `git diff --stat source/master`
+  diff = `git diff --stat --diff-filter=ACMRTUXB source/master`
   modified_templates = diff.scan(/\w+.pmx/)
 
   PanamaxTemplateValidator.validate_file_list(modified_templates)
