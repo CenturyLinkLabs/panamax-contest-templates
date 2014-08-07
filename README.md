@@ -1,4 +1,4 @@
-[![Build Status](https://api.shippable.com/projects/53e286f80fdbd918000d782a/badge/master)](https://www.shippable.com/projects/53e12af15113f91a03ff6236)
+[![Build Status](https://api.shippable.com/projects/53e29b2d4f881a8700879052/badge/master)](https://www.shippable.com/projects/53e29b2d4f881a8700879052)
 
 ## Panamax Contest Template Repo
 
