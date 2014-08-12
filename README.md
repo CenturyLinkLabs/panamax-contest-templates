@@ -10,7 +10,7 @@ Repo of the panamax template contest submissions. See: [panamax.io/contest](http
 [Learn more about what we think makes a good image and template.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/Panamax-Public-Templates)
 
 ## How to Submit a Contest Entry
-1. Install Panamax using the directions from  http://panamax.io/get-panamax.html
+1. Install Panamax using the directions from  http://panamax.io/get-panamax
 2. Create the best template you can think of, using the guidelines listed in the documentation at  http://panamax.io/documentation
 3. Fork Panamax Contest Template Repository from https://github.com/CenturyLinkLabs/panamax-contest-templates to your personal GitHub account
 4. Press "Save as Template" for your new application and save your template to your forked panamax-contest-templates repository
