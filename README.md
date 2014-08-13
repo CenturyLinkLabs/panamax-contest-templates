@@ -18,3 +18,5 @@ Repo of the panamax template contest submissions. See: [panamax.io/contest](http
 
 ## Validating your template
 Once a Pull Request has been issued, the [Panamax Template Validator](https://github.com/CenturyLinkLabs/panamax-template-validator) will run a quick sanity check on new or changed *.pmx files. If you would like to run the validator locally, in advance, simple run ```rake``` from the root of the forked template repo.
+
+**Avoid template name collisions:** - postfix your template name (and file name) with your "_[github username]" to ensure uniqueness for the contest. For example, I may make "wordpress_alexwelch.pmx"
