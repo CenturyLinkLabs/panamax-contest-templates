@@ -1,0 +1,54 @@
+---
+name: Ghost Blogging Platform
+description: "The Ghost blogging platform is a new system based on Node.js. Though
+  the Ghost platform has a hosted system, it is also free software and can be hosted
+  on your own servers.\r\n\r\nGhost is rather minimalistic compared to other full-featured
+  systems like Wordpress, but it makes up for it in simplicity and focus. Ghost allows
+  you to focus on writing your content, not managing your website."
+keywords: ghost, blog, cms, sqlite
+type: NodeJS
+documentation: |-
+  # Ghost
+
+  The Ghost blogging platform based on Node.js. Ghost is a minimalistic blogging platform that is simple to use and focused on publishing content.
+
+  ## System Requirements
+
+  - *RAM:* 256 MB
+  - *Cores:* 1 core
+
+  ## Setup
+
+  After the application service has started, access the web interface. You should see the Ghost blog up and running. After you are able to see the blog, you can proceed to the admin panel at "http://example.com/ghost", where "example.com" is your domain. You will setup you administrator here.
+
+  ## Post-Run Instructions
+
+  Simply follow the Ghost setup instructions to install Ghost.
+
+  ## Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  ``` VboxManage controlvm panamax-vm natpf1 rule,tcp,,8997,,2368 ```
+
+  Remember to set the port "2368" in the command above to the host port you see in the Panamax application settings screen.
+
+  ## Resources
+
+  - [Official Ghost Website](https://ghost.org/)
+images:
+- name: Ghost
+  source: wizardapps/ghost:v0.5.0
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '2368'
+    container_port: '2368'
+    proto: TCP
+  volumes:
+  - host_path: "/data/panamax-wizardapps-ghost"
+    container_path: "/ghost-override"
+  environment:
+  - variable: GHOST_URL
+    value: http://localhost
+  - variable: PORT
+    value: 2368
