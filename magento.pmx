@@ -1,0 +1,69 @@
+---
+name: Magento
+description: This Magento Panamax template helps you setup a neat magento installation
+  that has all production measures by default . Database & Caching are separated from
+  the web layer.
+keywords: Magento Panamax MariaDB MySQL Memcached Production Scalable Ecommerce Platform
+type: Magento
+documentation: |+
+  ##Application Name:
+
+  Magento powered by NginX PHP-FPM MariaDB Memcached
+
+  ##System Requirements:
+
+  Magento is not a poor-mans eCommerce framework , It might (will) bring your server down to its knees.
+
+  Minimum Recommended 2 Cores, 2GB of RAM
+  Recommended Setup : 4 Cores , 4GB of RAM
+
+  ##Setup:
+
+  All pretty much ready to go. Change your web layer's port mapping if you'd like this is optional
+
+  Visit your app at http://publicip/
+
+
+  ##Post-Run Instructions:
+
+  All you have to do is run the Installer and enter 'password' as your database password and setup magento anyway you need to.
+
+
+  ##Resources:
+
+
+  [Paimpozhil's Docker Magento] (https://github.com/paimpozhil/docker-magento)
+
+  [Memcached Image] (https://github.com/SylvainLasnier/memcached)
+
+  [MariaDB Image](https://github.com/Painted-Fox/docker-mariadb)
+
+  [Magento] (http://www.magentocommerce.com/)
+
+images:
+- name: paintedfox_mariadb_latest
+  source: paintedfox/mariadb:latest
+  category: Database
+  type: Default
+  environment:
+  - variable: USER
+    value: user
+  - variable: PASS
+    value: password
+- name: sylvainlasnier_memcached
+  source: sylvainlasnier/memcached:latest
+  category: Cache
+  type: Default
+- name: paimpozhil_magento-docker
+  source: paimpozhil/magento-docker:latest
+  category: Web Layer
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: paintedfox_mariadb_latest
+    alias: db
+  - service: sylvainlasnier_memcached
+    alias: cache
