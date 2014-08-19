@@ -1,0 +1,94 @@
+---
+name: Ajenti
+description: "Host any of your php or python based application with mysql / phpmyadmin
+  all this with \r\n\r\nAjenti / Ajenti-v inside Docker based on Centos OS."
+keywords: ''
+type: Default
+documentation: |+
+  Application Name:
+
+  Ajenti Control Panel over Centos
+
+  Host any php/python web app that you can imagine [ or ]
+  Utilize Nginx's reverse proxying or static service capabilities with this beautiful GUI.
+
+  System Requirements:
+  1 Core with 512 MB RAM.
+
+  Setup:
+
+  Setup is fairly straight forward,
+
+  Run the template and visit your https://[public IP]:8000  as root/admin and use all the features there like CRON / Terminals / Filemanager.
+
+  If you want to get to the shell to this container/ server.
+  ssh to your Public IP at port 2222 ( or whatever you gave above)
+
+  Default logins are root/ch@ngem3
+
+  Post-Run Instructions:
+
+  Setup sites under Websites in the control panel.
+
+  If you require PHPMYADMIN
+
+  Within the Ajenti Control panel, you will see under websites-> PHPMYADMIN
+  Click it and then disable the Maintenence mode.
+
+  Now visit
+
+  http://[public IP]:8008 and login with 'root' & no password
+  Mysql is unsecure/ no password by default .
+
+
+  Change all the passwords soon after you get in.
+
+
+  Port-Forwarding:
+
+  Edit the paimpozhil/miniajenti application under Control panel to change your port bindings as per your wish.
+  You may have to enter the host port for FTP,etc if you prefer to use them.
+
+  Add port bindings for 443 if you require SSL.
+
+  Resources:
+
+  https://github.com/paimpozhil/MiniAjenti
+
+  https://github.com/Eugeny/ajenti
+
+  https://github.com/Eugeny/ajenti-v
+
+images:
+- name: centurylink_mysql
+  source: centurylink/mysql:latest
+  category: Database
+  type: Default
+- name: paimpozhil_miniajenti
+  source: paimpozhil/miniajenti:latest
+  category: Control Panel
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  - host_port: '2222'
+    container_port: '22'
+    proto: TCP
+  - host_port: '8000'
+    container_port: '8000'
+    proto: TCP
+  - host_port: '8008'
+    container_port: '8008'
+    proto: TCP
+  - host_port: ''
+    container_port: '21'
+    proto: TCP
+  links:
+  - service: centurylink_mysql
+    alias: db
+  volumes:
+  - host_path: ''
+    container_path: "/var/www"
+  - host_path: ''
+    container_path: "/data"
