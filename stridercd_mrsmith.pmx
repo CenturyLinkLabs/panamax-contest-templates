@@ -1,0 +1,61 @@
+---
+name: Strider
+description: Strider is an Open Source Continuous Deployment / Continuous Integration platform
+keywords: nodejs, node, ci, cd, mongodb
+type: NodeJS
+documentation: |-
+  # Strider
+
+  Strider is an Open Source Continuous Deployment / Continuous Integration platform. It is written in Node.JS / JavaScript and uses MongoDB as a backing store. It is published under the BSD license.
+
+  Please find more details in [Readme](https://github.com/Strider-CD/strider#overview)
+
+  ## System Requirements
+
+  * *RAM:* 1024 MB
+  * *Cores:* 1 core
+
+  ## Setup
+
+  If you configure the port-forwarding as in the instructions below, you do not need to do additional setup. You can use default credentials for GitHub, Bitbucket etc
+
+  All possible configuration options can be found in the [documentation](https://github.com/Strider-CD/strider#configuring).
+
+  ## Post-Run Instructions
+
+  The default admin user for the Dockerized Strider is:
+
+  email: **test@example.com**
+
+  password: **dontlook**
+
+  ## Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  ```
+  VBoxManage controlvm panamax-vm natpf1 strider,tcp,,3000,,3030
+  ```
+
+  Where, `strider` is the friendly name of the rule, tcp is the protocol. Replace port _3000_ with the local free port of your choice. 
+
+  You can also use [these wiki instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) to setup port forwarding. 
+
+  After setup, browse to [localhost:3000](http://localhost:3000/) to see Strider GUI.
+
+  ## Resources
+
+  * [Official Strider website](http://stridercd.com/)
+  * [Strider on GitHub](https://github.com/Strider-CD/strider)
+  * [Base docker image](https://registry.hub.docker.com/u/niallo/strider/)
+  * [Docker and StriderCD](http://blog.frozenridge.co/docker-and-stridercd-brilliant-continuous-integration-in-a-box/)
+images:
+- name: Strider
+  source: niallo/strider:latest
+  category: App
+  type: Default
+  expose:
+  - '3000'
+  ports:
+  - host_port: '3030'
+    container_port: '3000'
+    proto: TCP
