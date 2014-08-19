@@ -1,0 +1,16 @@
+---
+name: coffee-react-arangodb
+description: Getting started with a template that will hot reload reactJS coffee code
+  and access arangodb
+keywords: arangodb, reactjs, react, coffee
+type: Default
+documentation: ''
+images:
+- name: joaodubas_arangodb_latest
+  source: joaodubas/arangodb:latest
+  category: DB
+  type: Default
+- name: coffee_react_live
+  source: coffee_react_live:latest
+  category: FrontEnd
+  type: Default
