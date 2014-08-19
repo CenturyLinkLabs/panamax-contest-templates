@@ -1,0 +1,77 @@
+---
+name: Django Stack - MySQL_mcclanahan
+description: A Django, uWSGI, Nginx container linked to a MySQL container.
+keywords: Django, MySQL, Nginx, uWSGI
+type: Django
+documentation: |+
+  #Django Stack - MySQL#
+  This template provides a quick method of deploying a Django, uWSGI, Nginx, MySQL stack.
+
+  #System Requirements#
+  Recommended 2 Cores, 2GB of RAM
+
+  #Setup#
+
+  ###Web Tier###
+  In /app currently a django project is created with startproject. You will probably want to replace the content of /app with the root of your django project.
+
+  uWSGI chdirs to /app so in uwsgi.ini you will need to make sure the python path to the wsgi.py file is relative to that.
+
+  ###Database Tier###
+  The first time that you run your template, a new user admin with all privileges will be created in MySQL with a random password. To get the password, check the logs of the container by running:
+
+      docker logs <CONTAINER_ID>
+
+  You will see an output like the following:
+
+      ========================================================================
+      You can now connect to this MySQL Server using:
+
+      mysql -uadmin -po9smf9sdfqw -h<host> -P<port>
+
+      Please remember to change the above password as soon as possible!
+      MySQL user 'root' has no password but only allows local connections
+      ========================================================================
+
+  In this case, o9smf9sdfqw is the password allocated to the admin user.
+  Remember that the root user has no password but it's only accessible from within the container.
+
+
+
+
+  #Post-Run Instructions#
+  You can mount a local volume to /home/docker/code/app to work with files locally.
+
+
+  #Port-Forwarding#
+  The template has been setup to allow access from the CoreOS to the webserver on port 8080.  To get access from your local machine create a port forward on the VirtualBox by entering the following at a terminal:
+
+      VboxManage controlvm panamax-vm natpf1 rule,tcp,,8997,,8080
+
+  This allows the local machine to connect to the Django app by going to http://127.0.0.1:8997 in a browser.
+
+  Detailed instructions can be found at [https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+
+
+
+images:
+- name: mcclanahan_django-uwsgi-nginx_latest
+  source: mcclanahan/django-uwsgi-nginx:latest
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: tutum_mysql
+    alias: tutum_mysql
+- name: tutum_mysql
+  source: tutum/mysql:latest
+  category: Database Tier
+  type: Default
+  ports:
+  - host_port: '3306'
+    container_port: '3306'
+    proto: TCP
