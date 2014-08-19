@@ -1,7 +1,6 @@
 ---
 name: coffee-react-arangodb
-description: Getting started with a template that will hot reload reactJS coffee code
-  and access arangodb
+description: ReactJS live loading w/ arangodb backend
 keywords: arangodb, reactjs, react, coffee
 type: Default
 documentation: ''
@@ -10,6 +9,10 @@ images:
   source: joaodubas/arangodb:latest
   category: DB
   type: Default
+  ports:
+  - host_port: '8529'
+    container_port: '8529'
+    proto: TCP
 - name: coffee_react_live
   source: coffee_react_live:latest
   category: FrontEnd
