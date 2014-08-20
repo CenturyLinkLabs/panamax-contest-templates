@@ -1,0 +1,89 @@
+---
+name: KeystoneJS
+description: KeystoneJS is a powerful new Node.js CMS and web app framework
+keywords: nodejs, node, keystone, keystonejs, mongo, mongodb, mongoose, express, expressjs, cms
+type: NodeJS
+documentation: |-
+  # KeystoneJS
+
+  [KeystoneJS](http://keystonejs.com) is a powerful new Node.js content management system and web app framework built on [express](http://expressjs.com) and [mongoose](http://mongoosejs.com) that makes it easy to create sophisticated web sites and apps, and gives you a beautiful, auto-generated Admin UI.
+
+  To get started, check out [keystonejs.com](http://keystonejs.com)!
+
+  ## About
+
+  Keystone gives you:
+
+  * A simple way to create a dynamic web site or app with well-structured routes, templates and models
+  * A beautiful Admin UI based on the database models you define
+  * Enhanced `models` with additional field types and functionality, building on those natively supported by Mongoose
+  * Out of the box session management and authentication
+  * An updates framework for managing data updates or initialisation
+  * Integration with Cloudinary for image uploading, storage and resizing
+  * Integration with Mandrill for sending emails easily
+  * Integration with Google Places for clever location fields
+  * Integration with Embedly for powerful video and rich media embedding tools
+
+  ... plus a lot of other tools and utilities to make creating complex web apps easier.
+
+  ## System Requirements
+
+  * *RAM:* 256 MB
+  * *Cores:* 1 core
+
+  ## Notes
+
+  This template provides a bundled docker image of MongoDB: [dockerfile/mongodb](https://registry.hub.docker.com/u/dockerfile/mongodb/)
+
+  ## Setup
+  
+  KeystoneJS docker image assumes that you provide the following environment variables:
+
+  * `CLOUDINARY_URL` - [Cloudinary](http://cloudinary.com/) config
+  * `MANDRILL_API_KEY` - [Mandrill](http://mandrill.com/) api key
+
+  All possible environment variables can be found in the [documentation](http://keystonejs.com/docs/configuration/).
+
+  ## Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8080,,8080
+  ```
+
+  Where, `keystone` is the friendly name of the rule, tcp is the protocol. Replace port _8080_ with the local free port of your choice. 
+
+  You can also use [these wiki instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) to setup port forwarding. 
+
+  After setup, browse to [localhost:8080](http://localhost:8080/) to see Keystone application.
+
+  ## Resources
+
+  * [Official KeystoneJS Website](http://keystonejs.com)
+  * [NodeJS](http://nodejs.org/)
+  * [Express](http://expressjs.com)
+  * [Mongoose](http://mongoosejs.com)
+  * [KeystoneJS docker image](https://registry.hub.docker.com/u/mahnunchik/keystonejs/)
+images:
+- name: KeystoneJS App
+  source: mahnunchik/keystonejs:latest
+  category: Web Tier
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: mongodb
+    alias: mongo
+  environment:
+  - variable: CLOUDINARY_URL
+    value: cloudinary://333779167276662:_8jbSi9FB3sWYrfimcl8VKh34rI@keystone-demo
+  - variable: MANDRILL_API_KEY
+    value: NY8RRKyv1Bure9bdP8-TOQ
+- name: mongodb
+  source: dockerfile/mongodb:latest
+  category: Database Tier
+  type: Default
