@@ -1,0 +1,32 @@
+---
+name: Concrete5
+description: Concrete5 deployment
+keywords: concrete5, mysql
+type: Default
+documentation: ''
+images:
+- name: mcclanahan_docker-concrete5_latest
+  source: mcclanahan/docker-concrete5:latest
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: centurylink_mysql
+    alias: centurylink_mysql
+  environment:
+  - variable: DB_PASSWORD
+    value: pass@word01
+  - variable: DB_NAME
+    value: concrete5
+- name: centurylink_mysql
+  source: centurylink/mysql:5.5
+  type: Default
+  ports:
+  - host_port: '3306'
+    container_port: '3306'
+    proto: TCP
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word01
