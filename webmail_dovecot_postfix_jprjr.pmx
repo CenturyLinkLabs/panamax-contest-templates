@@ -1,5 +1,5 @@
 ---
-name: John Regan
+name: Email with Dovecot, Postfix, SpamAssassin, and Webmail with RainLoop
 description: "This aspires to be a full-fledged email system as an easy-to-deploy
   template. I want to make email easier to use!\r\n\r\nUnfortunately, Postfix and
   Docker seem to not get along, and I'm simply out of time to continue working on
