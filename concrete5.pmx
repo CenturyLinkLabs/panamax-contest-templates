@@ -5,24 +5,10 @@ keywords: concrete5, mysql
 type: Default
 documentation: ''
 images:
-- name: mcclanahan_docker-concrete5_latest
-  source: mcclanahan/docker-concrete5:latest
-  type: Default
-  ports:
-  - host_port: '8080'
-    container_port: '80'
-    proto: TCP
-  links:
-  - service: centurylink_mysql
-    alias: centurylink_mysql
-  environment:
-  - variable: DB_PASSWORD
-    value: pass@word01
-  - variable: DB_NAME
-    value: concrete5
-- name: centurylink_mysql
+- name: DB
   source: centurylink/mysql:5.5
-  type: Default
+  description: MySQL
+  type: mysql
   ports:
   - host_port: '3306'
     container_port: '3306'
@@ -30,3 +16,20 @@ images:
   environment:
   - variable: MYSQL_ROOT_PASSWORD
     value: pass@word01
+  category: DB Tier
+- name: APP
+  source: mcclanahan/docker-concrete5:latest
+  description: Concrete5
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: DB
+    alias: DB_1
+  environment:
+  - variable: DB_PASSWORD
+    value: pass@word01
+  - variable: DB_NAME
+    value: concrete5
