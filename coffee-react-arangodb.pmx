@@ -1,7 +1,7 @@
 ---
 name: coffee-react-arangodb
-description: ReactJS live loading w/ arangodb backend
-keywords: arangodb, reactjs, react, coffee
+description: Doesn't quite work yet
+keywords: ''
 type: Default
 documentation: ''
 images:
@@ -17,3 +17,13 @@ images:
   source: coffee_react_live:latest
   category: FrontEnd
   type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  environment:
+  - variable: CULT_DIR
+    value: "/var/cult"
+  volumes:
+  - host_path: "/var/mycode/cult"
+    container_path: "/var/cult"
