@@ -1,0 +1,240 @@
+---
+name: John Regan
+description: "This aspires to be a full-fledged email system as an easy-to-deploy
+  template. I want to make email easier to use!\r\n\r\nUnfortunately, Postfix and
+  Docker seem to not get along, and I'm simply out of time to continue working on
+  this further.\r\n\r\nMaking this template really taught me how I *should* be making
+  my Docker images, though, to be friendlier towards systems like Panamax - I've written
+  about it here: https://jrjrtech.com/blog/blog/2014/08/20/panamax-docker-best-practices/"
+keywords: email,webmail,dovecot,postfix,rainloop,mysql
+type: Default
+documentation: |
+  # Email with Dovecot, Postfix, SpamAssassin, and Webmail with RainLoop
+
+  ## Current working status: partially
+
+  So off the bat, just to let you know - this template doesn't fully work yet
+  (you can't actually send or recieve mail).
+  I'm still putting it out there, in the hopes that somebody can pick
+  up where I left off and build something useful.
+
+  I've written a [blog post](https://jrjrtech.com/blog/blog/2014/08/20/panamax-docker-best-practices/) about the process, where I try to outline some
+  best practices for making new Docker images.
+
+  ## Requirements
+
+  I recommend at least 1GB of RAM and two cores for good performance.
+
+  ## Application Setup
+
+  ### Environment variables
+
+  Setting up an email system is no easy task! First thing's first, here's the
+  list of **required** environment variables you'll need to deploy this template:
+
+  * `MYSQL_ROOT_PASSWORD` - This sets the root password on the `mysql` image.
+  * `MYSQL_USER` and `MYSQL_PASS` - Set this to `root` and whatever you put into `MYSQL_ROOT_PASSWORD`, respectively.
+  * `DOVECOT_SQL_USER` and `DOVECOT_SQL_PASS` - This is the username and password for accessing the user database.
+  * `ADMIN_EMAIL` - This does two things: it creates a default mail account, and it also drives what domain this mail system serves.
+  * `ADMIN_PASS` - This is the password for the `ADMIN_EMAIL` account.
+  * `NGINX` - Set this to `1` on the `jprjr/rainloop` image to use an embedded NGINX process.
+
+  Here's the list of what environment variables each container needs:
+
+  * `mysql` - `MYSQL_ROOT_PASSWORD`
+  * `jprjr/ubuntu-dovecot` - `MYSQL_USER`, `MYSQL_PASS`, `DOVECOT_SQL_USER`,
+    `DOVECOT_SQL_PASS`, `ADMIN_EMAIL`, `ADMIN_PASS`
+  * `jprjr/ubuntu-spamassassin` - None.
+  * `jprjr/ubuntu-postfix` - `DOVECOT_SQL_USER`, `DOVECOT_SQL_PASS`, `ADMIN_EMAIL`
+  * `jprjr/rainloop` - `NGINX`
+  * `jprjr/mailadmin` - `DOVECOT_SQL_USER`, `DOVECOT_SQL_PASS`
+
+  Some images have a few other variables available, but they're not needed
+  for this application.
+
+  ### Required files
+
+  You'll need to place your public ssh key into an `authorized_keys` file at
+  `/home/core/jprjr-webmail/private/ssh/authorized_keys` and restart.
+
+  ### Port Forwarding
+
+  In order to use these services, you'll need to forward some ports.
+
+  If you're running Panamax on a local machine with VirtualBox, here's
+  some handy port-forwarding commands:
+
+  * SSH access to `jprjr/mailadmin`:
+    `VBoxManage controlvm panamax-vm natpf1 mailadmin,tcp,,10022,,10022`
+  * HTTP access to `jprjr/rainloop`:
+    `VBoxManage controlvm panamax-vm natpf1 webmail,tcp,,8080,,8080`
+  * IMAP access to `jprjr/ubuntu-dovecot`:
+    `VBoxManage controlvm panamax-vm natpf1 imap,tcp,,143,,143`
+  * SMTP access to `jprjr/ubuntu-postfix`:
+    `VBoxManage controlvm panamax-vm natpf1 smtp,tcp,,25,,25`
+  * Submission access to `jprjr/ubuntu-postfix`:
+    `VBoxManage controlvm panamax-vm natpf1 submission,tcp,,587,,587`
+
+  ## Post-Run Usage
+
+
+  ### jprjr/rainloop
+  Open a web browser to [localhost:8080/?admin](http://localhost:8080/?admin)
+  (or whatever you setup - the important part of the url is `?admin`), and
+  login as `admin` with the password `12345`.
+
+  In the rainloop administrative interface, click `Domains`, and add your
+  domain from the `ADMIN_EMAIL` environment variable. The Dovecot and
+  Postfix containers are linked as `imap` and `smtp`, respectively, so
+  use those as your server names.
+
+  As of this writing, testing the SMTP server will fail (I still don't
+  have Postfix working correctly). This means actually sending email will
+  not work.
+
+  Then navigate to [localhost:8080](http://localhost:8080) and start using
+  RainLoop! You should be able to login with whatever you set in the
+  `ADMIN_EMAIL` and `ADMIN_PASS` environment variables.
+
+  ### jprjr/mailadmin
+  Once the application has been restarted/rebuilt after placing your ssh public key
+  into `/home/core/jprjr-webmail/private/ssh/authorized_keys`, run:
+
+  `ssh -p 10022 mailadmin@localhost`
+
+  You'll have a shell where you can run a `mailadmin` command for listing
+  users, adding new users, deleting users, and so on. Just typing `mailadmin`
+  will show you how to use it.
+
+  ### jprjr/ubuntu-dovecot and jprjr/ubuntu-postfix
+
+  These work like any other mail server - configuring a mail client like
+  Thunderbird, Geary, etc is beyond the scope of this document.
+images:
+- name: mysql
+  source: mysql:latest
+  category: DB
+  type: Default
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: mysqlr00t
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/lib/mysql"
+    container_path: "/var/lib/mysql"
+- name: jprjr_ubuntu-dovecot
+  source: jprjr/ubuntu-dovecot:14.04
+  category: Mail
+  type: Default
+  expose:
+  - '10026'
+  - '12345'
+  ports:
+  - host_port: '143'
+    container_port: '143'
+    proto: TCP
+  - host_port: '993'
+    container_port: '993'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: MYSQL_USER
+    value: root
+  - variable: MYSQL_PASS
+    value: mysqlr00t
+  - variable: DOVECOT_SQL_USER
+    value: dovecot
+  - variable: DOVECOT_SQL_PASS
+    value: dovecotr00t
+  - variable: ADMIN_EMAIL
+    value: postmaster@nowhere.local
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/srv/mail"
+    container_path: "/srv/mail"
+  - host_path: "/home/core/jprjr-webmail/etc/dovecot"
+    container_path: "/etc/dovecot"
+  - host_path: "/home/core/jprjr-webmail/private"
+    container_path: "/private"
+- name: jprjr_ubuntu-spamassassin
+  source: jprjr/ubuntu-spamassassin:14.04
+  category: Mail
+  type: Default
+  expose:
+  - '10025'
+  links:
+  - service: jprjr_ubuntu-dovecot
+    alias: dovecot
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/lib/spamassasin"
+    container_path: "/var/lib/spamassassin"
+- name: jprjr_ubuntu-postfix
+  source: jprjr/ubuntu-postfix:14.04
+  category: Mail
+  type: Default
+  ports:
+  - host_port: '25'
+    container_port: '25'
+    proto: TCP
+  - host_port: '587'
+    container_port: '587'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  - service: jprjr_ubuntu-dovecot
+    alias: dovecot
+  - service: jprjr_ubuntu-spamassassin
+    alias: spamassassin
+  environment:
+  - variable: DOVECOT_SQL_USER
+    value: dovecot
+  - variable: DOVECOT_SQL_PASS
+    value: dovecotr00t
+  - variable: ADMIN_EMAIL
+    value: postmaster@nowhere.local
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/private"
+    container_path: "/private"
+  - host_path: "/home/core/jprjr-webmail/etc/postfix"
+    container_path: "/etc/postfix"
+- name: jprjr_rainloop
+  source: jprjr/rainloop:latest
+  category: Web
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: jprjr_ubuntu-dovecot
+    alias: imap
+  - service: jprjr_ubuntu-postfix
+    alias: smtp
+  environment:
+  - variable: NGINX
+    value: '1'
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/lib/rainloop"
+    container_path: "/var/lib/rainloop/data"
+- name: jprjr_mailadmin
+  source: jprjr/mailadmin:latest
+  category: SSH
+  type: Default
+  ports:
+  - host_port: '10022'
+    container_port: '22'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: DOVECOT_SQL_USER
+    value: dovecot
+  - variable: DOVECOT_SQL_PASS
+    value: dovecotr00t
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/etc/ssh"
+    container_path: "/etc/ssh"
+  - host_path: "/home/core/jprjr-webmail/private"
+    container_path: "/private"
