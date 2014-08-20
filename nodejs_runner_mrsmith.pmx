@@ -1,0 +1,54 @@
+---
+name: NodeJS Runner
+description: Template for easily running NodeJS application by providing url to the git repository
+keywords: nodejs, node, git, github
+type: NodeJS
+documentation: |-
+  # NodeJS Runner
+
+  Template for easily running NodeJS application by injection its code into a pre-packaged [docker image](https://registry.hub.docker.com/u/mahnunchik/nodejs-runtime/).
+
+  ## Setup
+
+  This template assumes that you provide `GIT_REPO` environment variable with the path to git repository.
+
+  Base image of this template assumes that your `NodeJS` application:
+
+  * has a file named [package.json](https://www.npmjs.org/doc/json.html) listing its dependencies
+  * define in `package.json` the attribute: `"scripts": {"start": "node <entrypoint_script_js>"}`
+  * takes the port for listening from `PORT` environment  variable
+
+  ## Port Forwarding
+
+  To view the GUI after launching the template, map your local host machine to port _8080_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 nodeapp,tcp,,8080,,8080`
+
+  Where, `nodeapp` is the friendly name of the rule, tcp is the protocol. Replace port _8080_ with the local free port of your choice. 
+
+  You can also use [these wiki instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) to setup port forwarding. 
+
+  After setup, browse to [localhost:8080](http://localhost:8080/) to see your application.
+
+  ## Resources
+
+  * [Base image](https://registry.hub.docker.com/u/mahnunchik/nodejs-runtime/)
+  * [NodeJS image](https://registry.hub.docker.com/_/node/)
+  * [NodeJS](http://nodejs.org/)
+images:
+- name: NodeJS Application
+  source: mahnunchik/nodejs-runtime:latest
+  category: Web Tier
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  environment:
+  - variable: GIT_REPO
+    value: https://github.com/heroku/node-js-sample
+    required: true
+  - variable: PORT
+    value: 8080
