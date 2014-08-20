@@ -1,0 +1,22 @@
+---
+name: Hedgewars Game Server
+description: "Host your own Hedgewars Server!\r\n\r\nhttp://www.hedgewars.org/"
+keywords: hedgewars, server, multiplayer
+type: Default
+documentation: |-
+  Port forward 9000 on the panamax VM.
+
+  For server discovery to work, you need you add the UDP ports on the application as well as port forward on the VM.
+
+  In your Hedgewars client, connect with port 9000 on your server's ip address.
+
+  Enjoy!
+images:
+- name: vivian_hedgewars_latest
+  source: vivian/hedgewars:latest
+  category: " "
+  type: Default
+  ports:
+  - host_port: '9000'
+    container_port: '9000'
+    proto: TCP
