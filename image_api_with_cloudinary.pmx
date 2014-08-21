@@ -1,0 +1,39 @@
+---
+name: Image API with Cloudinary
+description: "Simple image api using nodejs, mongo and cloudinary for image storage.\r\n\r\nThis
+  template is great as a starter nodejs app. Fork from https://github.com/kennethklee/images-api."
+keywords: ''
+type: NodeJS
+documentation: |-
+  images-api
+  ===========
+
+  This is a very basic node image api that uses Mongo & Cloudinary.
+
+  Set your environment variables on the Web Tier:
+  `NODE_ENV` - Set to `production` to use cloudinary, otherwise, it'll fallback to empty images.
+  `CLOUD_NAME` - Cloudinary cloud name
+  `CLOUD_KEY` - Cloudinary access key
+  `CLOUD_SECRET` - Cloudinary access secret
+
+  API Endpoints are
+  GET /images
+  POST /images
+  GET /images/:id  (works with JSON or HTML)
+  DELETE /images/:id
+images:
+- name: mongo_latest
+  source: mongo:latest
+  category: Data Tier
+  type: Default
+- name: kennethkl_images-api
+  source: kennethkl/images-api:latest
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '8000'
+    container_port: '8000'
+    proto: TCP
+  links:
+  - service: mongo_latest
+    alias: mongo

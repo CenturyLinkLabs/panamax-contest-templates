@@ -1,0 +1,25 @@
+---
+name: minecraft_jordan0day
+description: Run a minecraft server with Panamax
+keywords: minecraft
+type: Default
+documentation: |-
+  Minecraft Server
+
+  Run with at least 1 gb of memory.
+
+  Make sure to expose and forward port 25565.
+images:
+- name: itzg_minecraft-server_latest
+  source: itzg/minecraft-server:latest
+  category: game servers
+  type: Default
+  expose:
+  - '25565'
+  ports:
+  - host_port: '25565'
+    container_port: '25565'
+    proto: TCP
+  environment:
+  - variable: MOTD
+    value: Minecraft, via Panamax!
