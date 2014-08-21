@@ -3,7 +3,7 @@ name: Concrete5
 description: Concrete5 deployment
 keywords: concrete5, mysql
 type: Default
-documentation: ''
+documentation: 'Concrete5 container linked to MySQL container'
 images:
 - name: DB
   source: centurylink/mysql:5.5
