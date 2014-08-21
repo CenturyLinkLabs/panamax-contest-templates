@@ -1,34 +1,49 @@
----
-name: Concrete5
-description: Concrete5 deployment
-keywords: concrete5, mysql
-type: Default
-documentation: 'Concrete5 container linked to MySQL container'
+name: Concrete5 with MySQL
+description: Concrete5 container linked to a MySQL container
+keywords: concrete5, mysql, all
+recommended: true
+documentation: |
+  Concrete5 with MySQL
+  ============================
+  The alias for the link between Concrete5 and MySQL needs to be _DB_1_. If this is changed, the template will not work.
+
+  Also, the password can be changed, but the environmental variables need to be changed on both services.
+
+  To view the GUI after launching the template, map your local host machine to port _8080_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 concrete5,tcp,,8997,,8080`
+
+  Where, concrete5 is the friendly name of the rule, tcp is the protocol. Replace port _8997_ with the local free port of your choice. If you change the port bindings on the Concrete5 service, _8080_ will need to be changed to match that too.
+
+  After you run this command locally, browse to **http://localhost:8997** to see the GUI, as per the example.
+authors: 
+- 'jacob@innovatifi.com'
+type: concrete5
 images:
 - name: DB
   source: centurylink/mysql:5.5
   description: MySQL
-  type: mysql
-  ports:
-  - host_port: '3306'
-    container_port: '3306'
-    proto: TCP
   environment:
-  - variable: MYSQL_ROOT_PASSWORD
-    value: pass@word01
-  category: DB Tier
-- name: APP
-  source: mcclanahan/docker-concrete5:latest
-  description: Concrete5
-  type: Default
+    - variable: MYSQL_ROOT_PASSWORD
+      value: pass@word01
   ports:
-  - host_port: '8080'
-    container_port: '80'
-    proto: TCP
+  - host_port: 3306
+    container_port: 3306
+  category: DB Tier
+  type: mysql
+- name: Concrete5
+  source: mcclanahan/docker-concrete5:latest
+  description: oncrete5
+  environment:
+    - variable: DB_PASSWORD
+      value: pass@word01
+    - variable: DB_NAME
+      value: concrete5
   links:
   - service: DB
-  environment:
-  - variable: DB_PASSWORD
-    value: pass@word01
-  - variable: DB_NAME
-    value: concrete5
+    alias: DB_1
+  ports:
+  - host_port: 8080
+    container_port: 80
+  category: Web Tier
+  type: Default
