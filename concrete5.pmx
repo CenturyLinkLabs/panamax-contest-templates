@@ -27,7 +27,6 @@ images:
     proto: TCP
   links:
   - service: DB
-    alias: DB_1
   environment:
   - variable: DB_PASSWORD
     value: pass@word01
