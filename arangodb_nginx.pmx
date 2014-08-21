@@ -41,6 +41,7 @@ documentation: |2-
   Then download an arango.js version, and create an example index.html that uses it.  Remember to set the host to localhost:18529
   **Test**
   Open [http://localhost:18529/](http://localhost:18529/) and you should see the ArangoDB built-in front end.    
+
   Open [http://localhost:18080/](http://localhost:18080/) and you should see some JSON output from arango.js talking to the ArangoDB API.
   
   * **Resources:**
