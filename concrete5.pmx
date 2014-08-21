@@ -6,29 +6,32 @@ documentation: |
   #Concrete5 with MySQL#
   This template will install concrete5 version 5.6.3.1 on one container and link to a new MySQL database container. 
 
-  #System Requirements#
+
+  ##System Requirements##
   Recommended 2 Cores, 2GB of RAM
 
-  #Setup#
-  The alias for the link between Concrete5 and MySQL needs to be DB_1. If this is changed, the template will not be able to create the concrete5 database.
 
+  ##Setup##
+  The alias for the link between Concrete5 and MySQL needs to be DB_1. If this is changed, the template will not be able to create the concrete5 database.
   The password can be changed, but the environmental variables will need to be changed on both services.
 
-  #Port-Forwarding#
+
+  ##Port-Forwarding##
   The template has been setup to allow access from the CoreOS to the webserver on port 8080.  To get access from your local machine create a port forward on the VirtualBox by entering the following at a terminal:
 
       VboxManage controlvm panamax-vm natpf1 rule,tcp,,8997,,8080
 
   This allows the local machine to connect to the concrete5 app by going to http://127.0.0.1:8997 in a browser.
-
   Detailed instructions can be found at [https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) 
 
-  #Post-Run Instructions#
+
+  ##Post-Run Instructions##
   After the template has launched and you have port forwarding setup as described above go to http://127.0.0.1:8997 in a browser and follow the concrete5 install steps.  Use the following information to get started quiclky:
       Server: DB_1
       MySQL Username: root
       MySQL Password: pass@word01
       Database Name: concrete5
+      
       
 authors: 
 - 'jacob@innovatifi.com'
