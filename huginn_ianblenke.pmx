@@ -1,5 +1,5 @@
 ---
-name: huginn
+name: ianblenke_huginn
 description: A three tier Huginn deployment with haproxy, two Huggin application containers,
   and a mysql container.
 keywords: huginn haproxy mysql
