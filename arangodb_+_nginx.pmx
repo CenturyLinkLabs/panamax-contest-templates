@@ -1,0 +1,68 @@
+---
+name: ArangoDB + nginx
+description: 'A graph database and a web server linked in one template: nginx and
+  ArangoDB.  It will let you run arango.js pages from your mounted volume, as long
+  as you forward your ports correctly'
+keywords: graph, nginx, arangodb, arango
+type: Default
+documentation: |2-
+
+  * **ArangoDB + nginx:**
+  A graph database and a web server linked in one template.  If you forward ports correctly you can run arangojs from inside your nginx, but the API calls will run from your browser.  One could do client side rendering w/ nodejs using the linked container, aka http://arangodb:8529/ instead of localhost:forwardedport, but I had a lot of trouble getting anything of the sort working.
+
+
+  * **System Requirements:**
+  Recommended 2 Cores, 4GB of RAM  (2GB may work, no guarantees)
+
+  * **Setup:**
+  The only secret sauce is mounting a drive through vagrant (VirtualBox) via NFS.  This is done as follows, add these lines to .panamax/Vagrantfile, I have them right before the "Docker Mount" comment:
+      config.vm.network "private_network", ip: "172.12.8.150"
+      config.vm.synced_folder "/path/to/your/code", "/var/mycode", id: "core", :nfs => true,  :mount_options   => ['nolock,vers=3,udp,actimeo=2
+  ']
+
+  * **Port-Forwarding:**
+    If using Virtual Box, use the following commands in your local machine's terminal window to create the port forwarding rules:
+    `VboxManage controlvm panamax-vm natpf1 dbrule,tcp,,18529,,18529`
+    `VboxManage controlvm panamax-vm natpf1 ferule,tcp,,18080,,18080`
+
+    or use a [link to our wiki page instructions.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+     Note that the javascript assumes that arango is on 18529
+
+  * **Post-Run Instructions:**
+  **Important** you must do one of the following:
+  Easy mode:
+      cd /path/to/your/code #remember this is mounted through vagrant to your coreOS box
+      git clone https://github.com/rseymour/arango_demo.git
+  Expert mode:
+  `mkdir /path/to/your/code/arango_demo`
+  Then download an arango.js version, and create an example index.html that uses it.  Remember to set the host to localhost:18529
+
+  * **Resources:**
+  [ArangoDB](http://www.arangodb.com/)
+  [ArangoJS](https://github.com/triAGENS/ArangoDB-JavaScript)
+images:
+- name: nginx_latest
+  source: nginx:latest
+  category: Frontend
+  type: Default
+  ports:
+  - host_port: '18080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: joaodubas_arangodb
+    alias: arangodb
+  volumes:
+  - host_path: "/var/mycode/arango_demo"
+    container_path: "/usr/local/nginx/html"
+- name: joaodubas_arangodb
+  source: joaodubas/arangodb:latest
+  category: Database
+  type: Default
+  expose:
+  - '8529'
+  ports:
+  - host_port: '18529'
+    container_port: '8529'
+    proto: TCP
