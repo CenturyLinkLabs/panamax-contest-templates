@@ -33,7 +33,7 @@ images:
   type: mysql
 - name: Concrete5
   source: mcclanahan/docker-concrete5:latest
-  description: oncrete5
+  description: concrete5
   environment:
     - variable: DB_PASSWORD
       value: pass@word01
