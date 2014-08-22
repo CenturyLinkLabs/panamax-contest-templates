@@ -1,0 +1,41 @@
+
+name: Joomla with MySQL
+description: Joomla container linked to a MySQL container
+keywords: php, joomla, mysql
+documentation: |
+  Joomla with MySQL
+  ============================
+  Install latest Joomla, Apache, PHP.
+  Run VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8997,,8080 to port forward.
+  
+authors:
+- 'neekipatel@gmail.com'
+type: LAMP
+images:
+- name: DB
+  source: centurylink/mysql:5.5
+  description: MySQL
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word01
+  ports:
+  - host_port: 3306
+    container_port: 3306
+  category: DB Tier
+  type: mysql
+- name: Web
+  source: neekipatel/docker-joomla:latest
+  description: Joomla application
+  environment:
+  - variable: DB_PASSWORD
+    value: pass@word01
+  - variable: DB_NAME
+    value: joomla
+  links:
+  - service: DB
+    alias: DB_1
+  ports:
+  - host_port: 8080
+    container_port: 80
+  category: Web Tier
+  type: Default
