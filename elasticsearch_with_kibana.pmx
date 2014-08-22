@@ -1,7 +1,6 @@
 ---
 name: ElasticSearch With Kibana
-description: Want to visualize your logs for free instead of spending millions with
-  Splunk? I'm here to help.
+description: ElasticSearch Linked to Kibana which is viewable from NGINX
 keywords: ''
 type: Default
 documentation: |-
@@ -11,7 +10,7 @@ documentation: |-
 
   Setup: ElasticSearch over port 9200, Kibana dashboard over.
 
-  Post-Run Instructions: Go http://localhost:9200.
+  Post-Run Instructions: Go http://localhost and have fun.
 images:
 - name: dockerfile_elasticsearch_latest
   source: dockerfile/elasticsearch:latest
@@ -21,3 +20,20 @@ images:
   source: arcus/kibana:latest
   category: UI
   type: Default
+  expose:
+  - ''
+  - '9200'
+  links:
+  - service: dockerfile_elasticsearch_latest
+    alias: dockerfile_elasticsearch_latest
+- name: nginx
+  source: nginx:latest
+  category: Web Server
+  type: Default
+  ports:
+  - host_port: '9200'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: arcus_kibana
+    alias: arcus_kibana
