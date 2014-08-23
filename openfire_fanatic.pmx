@@ -1,0 +1,98 @@
+---
+name: OpenFire
+description: OpenFire XMPP ("Jabber") IM Chat Server
+keywords: openfire, xmpp, chat, jabber
+type: default
+documentation: |-
+  # OpenFire
+
+  Openfire is a real time collaboration (RTC) server. It uses the only widely adopted open protocol for instant messaging, XMPP (also called Jabber). 
+
+  ## System Requirements
+
+  * *RAM:* 1024 MB
+  * *Cores:* 1 core
+
+  ## Setup
+
+  If you configure the port-forwarding as in the instructions below, just point your browser to `http://localhost:9090` and login with username *admin* and password *admin*.
+  
+  All possible configuration options can be found in the [documentation](https://www.igniterealtime.org/projects/openfire/documentation.jsp).
+
+  ## Port-Forwarding
+
+  There are dozens of ports that openfire can use.  The most important three are:
+  
+  Port | Description
+  ---- | ----
+  5222 | How clients connect
+  9090 | Admin Console
+  7777 | File Transfer Proxy
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  ```
+  VBoxManage controlvm panamax-vm natpf1 openfire,tcp,,5222,,15222
+  VBoxManage controlvm panamax-vm natpf1 openfire-admin,tcp,,9090,,19090
+  VBoxManage controlvm panamax-vm natpf1 openfire-ftp,tcp,,7777,,17777
+  ```
+
+  Where, `openfire` is the friendly name of the rule, tcp is the protocol. Replace port _9090_ with the local free port of your choice. 
+
+  You can also use [these wiki instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) to setup port forwarding. 
+
+  After setup, browse to [localhost:9090](http://localhost:9090/) to see the OpenFire GUI.
+  
+  ## Connecting with a client
+  
+  Just configure your chat client on your local machine for the "Jabber" service, with a JID of "admin@localhost" and password "admin".  Easily add more users in the web interface and you're talkin'.
+  
+  If you have trouble, ensure port 5222 is port forwarded from your local machine, or look at the logs in the admin console.
+
+  ## Resources
+
+  * [Official Openfire website](http://www.igniterealtime.org/projects/openfire/)
+  * [Base docker image](https://registry.hub.docker.com/u/fanatic/openfire/)
+  
+images:
+- name: DB
+  source: centurylink/mysql:5.5
+  category: DB
+  type: mysql
+  ports:
+  - host_port: 3306
+    container_port: 3306
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word01
+  - variable: MYSQL_DATABASE
+    value: openfire
+  - variable: MYSQL_USER
+    value: openfire
+  - variable: MYSQL_PASSWORD
+    value: open#fire7542
+- name: Openfire
+  source: fanatic/openfire:latest
+  category: App
+  type: Default
+  expose:
+  - '5222'
+  - '9090'
+  - '7777'
+  ports:
+  - host_port: '15222'
+    container_port: '5222'
+    proto: TCP
+  - host_port: '19090'
+    container_port: '9090'
+    proto: TCP
+  - host_port: '17777'
+    container_port: '7777'
+    proto: TCP
+  links:
+  - service: DB
+    alias: DB_1
+  environment:
+  - variable: JDBC_USERNAME
+    value: openfire
+  - variable: JDBC_PASSWORD
+    value: open#fire7542

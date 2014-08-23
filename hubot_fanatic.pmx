@@ -1,0 +1,65 @@
+---
+name: hubot_fanatic
+description: Install Hubot chat bot in one easy click
+keywords: hubot, irc, hall
+type: HuBot
+documentation: |-
+  # Hubot
+
+  Hubot is a chat automation, moderator, bot, that's written in CoffeeScript, is infinitely pluggable, and works on just about all the chat platforms avaialble.
+
+  ## System Requirements
+
+  * *RAM:* 1024 MB
+  * *Cores:* 1 core
+
+  ## Setup
+
+  Setup is easy - just head over to the Environment Variables section.  Modify the HUBOT_IRC_ settings to meet your needs if you want to use the irc adapter.
+
+  If you want to use another adapter, check out the [hubot adapter doc](https://github.com/github/hubot/blob/master/docs/adapters.md), pick the one you like.  Update the HUBOT_DEPS variable to include the dependency (like "hubot-chatwork").  Then update the HUBOT_ADAPTER ("chatwork") so it knows what to start.  Finally, set the various environment variables documented in that adapter's README.md (like HUBOT_CHATWORK_TOKEN="DEADBEEF").
+
+  To add scripts/plugins, check out the [hubot script catalog](http://hubot-script-catalog.herokuapp.com/), and add them to the HUBOT_DEPS environment variable.
+
+  ## Resources
+   * [Official Hubot website](https://hubot.github.com/)
+   * [Base docker image](https://registry.hub.docker.com/u/zhesto/hubot/)
+images:
+- name: hubot
+  source: zhesto/hubot:latest
+  category: App
+  type: Default
+  links:
+  - service: sameersbn_redis
+    alias: db
+  environment:
+  - variable: HUBOT_ADAPTER
+    value: irc
+  - variable: HUBOT_DEPS
+    value: hubot-irc hubot-hall
+  - variable: HUBOT_IRC_ROOM
+    value: fanatic
+  - variable: HUBOT_IRC_NICK
+    value: hubot
+  - variable: HUBOT_IRC_PASSWORD
+    value: password
+  - variable: HUBOT_IRC_UNFLOOD
+    value: 'true'
+  - variable: HUBOT_IRC_ROOMS
+    value: "#fanatic"
+  - variable: HUBOT_IRC_SERVER
+    value: irc.freenode.net
+  - variable: HUBOT_HALL_EMAIL
+    value: hall@example.com
+  - variable: HUBOT_HALL_PASSWORD
+    value: some_pass
+  - variable: HUBOT_HALL_NICK
+    value: hallbot
+  volumes:
+  - host_path: ''
+    container_path: "/data"
+  command: sh -c "export PATH=/.nvm/v0.10.22/bin:$PATH ; export REDISCLOUD_URL=redis://$DB_PORT_6379_TCP_ADDR:$DB_PORT_6379_TCP_PORT ; hubot --create /data ; cd /data && npm install $HUBOT_DEPS ; ./bin/hubot -a $HUBOT_ADAPTER --name $HUBOT_IRC_NICK --alias '%'"
+- name: sameersbn_redis
+  source: sameersbn/redis:latest
+  category: DB
+  type: Default
