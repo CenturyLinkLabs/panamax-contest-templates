@@ -1,0 +1,129 @@
+---
+name: panamage
+description:
+keywords: nginx, varnish, redis, php, mysql
+recommended:
+type:
+documentation:
+images:
+
+---
+name: 'panamage'
+description: ''
+keywords: ''
+type: Default
+documentation: ''
+images:
+- name: lb_nginx
+  source: nginx:latest
+  category: LB
+  type: Default
+  expose:
+  - '80'
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  volumes:
+  - host_path: '/appdata/nginx'
+    container_path: '/usr/local/nginx/html'
+  - host_path: '/confdata/lb_nginx'
+    container_path: '/etc/nginx'
+- name: fpc_varnish
+  source: jacksoncage/varnish:latest
+  category: FPC
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: web_nginx
+    alias: web_nginx
+  environment:
+  - variable: VARNISH_BACKEND_IP
+    value: 127.0.0.1
+  - variable: VARNISH_PORT
+    value: '8080'
+  - variable: VARNISH_BACKEND_PORT
+    value: '8081'
+  volumes:
+  - host_path: '/confdata/fpc_varnish'
+    container_path: '/etc/varnish'
+- name: web_nginx
+  source: nginx:latest
+  category: WEB
+  type: Default
+  expose:
+  - '8081'
+  ports:
+  - host_port: '8081'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: lb_nginx
+    alias: lb_nginx
+  - service: fpc_varnish
+    alias: fpc_varnish
+  volumes:
+  - host_path: '/appdata/nginx'
+    container_path: '/usr/local/nginx/html'
+  - host_path: '/confdata/web_nginx'
+    container_path: "/etc/nginx"
+- name: app_php-fpm
+  source: jprjr/ubuntu-php-fpm:latest
+  category: APP
+  type: Default
+  expose:
+  - '9000'
+  ports:
+  - host_port: '9000'
+    container_port: '9000'
+    proto: TCP
+  links:
+  - service: web_nginx
+    alias: web_nginx
+  - service: db_mysql
+    alias: db_mysql
+  volumes:
+  - host_path: '/confdata/app_phpfpm'
+    container_path: '/etc/php5'
+- name: db_mysql
+  source: centurylink/mysql:latest
+  category: DB
+  type: Default
+  expose:
+  - '3306'
+  ports:
+  - host_port: '3306'
+    container_port: '3306'
+    proto: TCP
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: test123
+  - variable: MYSQL_DATABASE
+    value: pnmx
+  - variable: MYSQL_USER
+    value: pnmx
+  - variable: MYSQL_PASSWORD
+    value: test123
+  volumes:
+  - host_path: '/confdata/db_mysql'
+    container_path: '/etc/mysql'
+  - host_path: '/vardata/db_mysql'
+    container_path: '/var/lib/mysql'
+- name: db_redis
+  source: dockerfile/redis:latest
+  category: DB
+  type: Default
+  expose:
+  - '6379'
+  ports:
+  - host_port: '6379'
+    container_port: '6379'
+    proto: TCP
+  volumes:
+  - host_path: '/confdata/db_redis'
+    container_path: '/etc/redis'
