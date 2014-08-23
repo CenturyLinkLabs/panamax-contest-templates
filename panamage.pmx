@@ -1,18 +1,19 @@
 ---
 name: panamage
-description:
-keywords: nginx, varnish, redis, php, mysql
-recommended:
-type:
-documentation:
-images:
+description: this panamax template helps you setup a magento installation.
+keywords: magento, nginx, varnish, redis, php, mysql
+type: Magento
+documentation: |-
+  ##Application Name:
 
----
-name: 'panamage'
-description: ''
-keywords: ''
-type: Default
-documentation: ''
+  ##System Requirements:
+
+  ##Setup:
+
+  ##Post-Run Instructions:
+
+  ##Resources:
+
 images:
 - name: lb_nginx
   source: nginx:latest
@@ -25,9 +26,9 @@ images:
     container_port: '80'
     proto: TCP
   volumes:
-  - host_path: '/appdata/nginx'
+  - host_path: '/var/panamax/appdata/nginx'
     container_path: '/usr/local/nginx/html'
-  - host_path: '/confdata/lb_nginx'
+  - host_path: '/var/panamax/confdata/lb_nginx'
     container_path: '/etc/nginx'
 - name: fpc_varnish
   source: jacksoncage/varnish:latest
@@ -50,7 +51,7 @@ images:
   - variable: VARNISH_BACKEND_PORT
     value: '8081'
   volumes:
-  - host_path: '/confdata/fpc_varnish'
+  - host_path: '/var/panamax/confdata/fpc_varnish'
     container_path: '/etc/varnish'
 - name: web_nginx
   source: nginx:latest
@@ -68,9 +69,9 @@ images:
   - service: fpc_varnish
     alias: fpc_varnish
   volumes:
-  - host_path: '/appdata/nginx'
+  - host_path: '/var/panamax/appdata/nginx'
     container_path: '/usr/local/nginx/html'
-  - host_path: '/confdata/web_nginx'
+  - host_path: '/var/panamax/confdata/web_nginx'
     container_path: "/etc/nginx"
 - name: app_php-fpm
   source: jprjr/ubuntu-php-fpm:latest
@@ -88,7 +89,7 @@ images:
   - service: db_mysql
     alias: db_mysql
   volumes:
-  - host_path: '/confdata/app_phpfpm'
+  - host_path: '/var/panamax/confdata/app_phpfpm'
     container_path: '/etc/php5'
 - name: db_mysql
   source: centurylink/mysql:latest
@@ -102,17 +103,17 @@ images:
     proto: TCP
   environment:
   - variable: MYSQL_ROOT_PASSWORD
-    value: test123
+    value: insecurepassword
   - variable: MYSQL_DATABASE
     value: pnmx
   - variable: MYSQL_USER
     value: pnmx
   - variable: MYSQL_PASSWORD
-    value: test123
+    value: insecurepassword
   volumes:
-  - host_path: '/confdata/db_mysql'
+  - host_path: '/var/panamax/confdata/db_mysql'
     container_path: '/etc/mysql'
-  - host_path: '/vardata/db_mysql'
+  - host_path: '/var/panamax/vardata/db_mysql'
     container_path: '/var/lib/mysql'
 - name: db_redis
   source: dockerfile/redis:latest
@@ -125,5 +126,5 @@ images:
     container_port: '6379'
     proto: TCP
   volumes:
-  - host_path: '/confdata/db_redis'
+  - host_path: '/var/panamax/confdata/db_redis'
     container_path: '/etc/redis'
