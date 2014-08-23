@@ -38,7 +38,7 @@ documentation: |
   Step 5: Go to "Server Nodes"
   Add servers by IP address (Ref# Step: 2)
 images:
-- name: dustin_couchbase_latest
+- name: dustin_couchbase_latest_server_node
   source: dustin/couchbase:latest
   category: CouchBase cluster
   type: Default
