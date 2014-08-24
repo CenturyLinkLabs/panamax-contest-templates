@@ -1,0 +1,72 @@
+---
+name: Django with Postgres
+description: This template combines postgres with an django (nginx+uwsgi) app and supports live editing.
+keywords: django, postgres
+type: Django
+documentation: |-
+  Django with PostgreSQL and live editing
+  =========
+
+  ## Requirements
+
+  512MB RAM recommended.
+
+  ## Setup
+
+  This image supports mounting an arbitrary Django app to `/opt/django/app` inside the image (bound to `/home/core/django` on the panamax host) and attempting to run it as a postgres-backed app.  To do this, you'll need to mount `/home/core/django` on your local machine.  For example, in the `Vagrantfile` in `/home/.vagrant.d/boxes`, just after the `config.vm.synced_folder` line:
+
+  ```
+    config.vm.network "private_network", ip: "192.168.50.4"
+    config.vm.synced_folder "/run/django", "/home/core/django",
+    id: "django", :nfs => true, :mount_options => ['nolock,vers=3,udp']
+  ```
+
+  Then you can copy your app to /run/django on your local host, rebuild the template, and if all goes well, this template will create a database, install dependencies, run migrations, and start up your app.  You should create an environment variable called `MODULE` which contains the subfolder of /run/django where `settings.py` is present, and if you need to create an admin user in the newly-created postgres db for your app, you should create a file `/run/django/docker_run.sh` that contains something like this:
+
+  ```
+  echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass')" | ./manage.py shell
+  ```
+
+  ## Port Forwarding
+
+  To view the GUI after launching the template, map your local host machine to port _8123_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+  `VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8123,,8123`
+  Where, rule1 is the friendly name of the rule, tcp is the protocol. Replace port _8123_ with the local free port of your choice.
+  After you run this command locally, browse to **http://localhost:8123** to see the GUI, as per the example.
+
+  ## DB access
+
+  If you want to make database changes while live coding, you can port forward port 5123 to your local machine:
+
+  `VBoxManage controlvm panamax-vm natpf1 rule2,tcp,,5123,,5123`
+
+  and then run `psql --host localhost --port 5123 --user docker`.
+
+  ## Default passwords
+
+  The DB has default username `docker` and password `docker`.  The admin user example above creates an admin account with default username `admin` and default password `pass`.
+images:
+- name: rheinwein_pmx-pgsql_latest
+  source: rheinwein/pmx-pgsql:latest
+  category: DB Tier
+  type: Default
+  expose:
+  - '5123'
+  ports:
+  - host_port: '5123'
+    container_port: '5432'
+    proto: TCP
+- name: cjbprime_ubuntu-django-uwsgi-nginx-live
+  source: cjbprime/ubuntu-django-uwsgi-nginx-live:latest
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '8123'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: rheinwein_pmx-pgsql_latest
+    alias: db1
+  volumes:
+  - host_path: "/home/core/django"
+    container_path: "/opt/django/app"
