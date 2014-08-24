@@ -1,0 +1,134 @@
+---
+name: SpringXD
+description: This application template helps you set up a distributed Spring XD  environment.
+  One click deploy allows you to start streaming and analyzing data immediately.
+keywords: Spring XD, Big Data, Analytics, Hadoop, Java, Machine Learning, Open Source,
+  Data Ingestion
+type: Default
+documentation: |
+  ## Requirements
+  Make sure your panamax coreOS host has following resources
+  Minimum Recommended 2 Cores, 2GB of RAM
+  Recommended Setup : 4 Cores , 4GB of RAM
+
+  ####Hint
+
+  ```
+  panamax init --cpu=4 --memory=4096
+  ```
+  ```
+  panamax reinstall --cpu=4 --memory=4096 (you will lose all your services so be careful using this option)
+  ```
+
+  ## Setup
+
+  ###Default installation
+
+  Default configuration will start following 6 service containers.
+
+  * Redis
+  * RabbitMQ
+  * Zookeeper
+  * MySQL
+  * Spring XD Container
+  * Spring XD Admin Server
+
+  **Spring XD Container**  and **Admin Server** are preconfigured and linked to rest of the other middleware containers.
+  Admin Server listens on port 9393 and its exposed on panamax/docker host at port 9393
+
+  ###Port Forwarding
+
+  To access Admin Server from your localhost you need to add following port forwarding:
+
+  ```
+  VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,9494,,9393
+  ```
+
+  Change 9494 to port of your liking
+
+  ###Access to Admin Server
+
+  * **XD-Shell**: [http://localhost:9494]
+  * **UI**: [http://localhost:9494/admin-ui]
+
+  ###Override usernames and passwords
+
+  You can change MySQL and RabbitMQ username and passwords via environment variables. Set values for following properties under MySQL and RabbitMQ services
+
+  **MySQL**
+
+  * `spring_datasource_username`
+  * `spring_datasource_password`
+
+  **RabbitMQ**
+
+  * `spring_rabbitmq_username`
+  * `spring_rabbitmq_password`
+
+  ##Start Streaming
+
+  On your local host set up port forwarding to access XD Admin Server
+
+  ```
+  VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,9494,,9393
+  ```
+
+  Login to xd-shell and create stream
+
+  ```
+  xd-shell
+  xd:> config admin server http://localhost:9494
+  xd:> stream create --definition "time | log" --name ticktock --deploy
+  ```
+
+  ##References
+  * Spring XD project home page: http://projects.spring.io/spring-xd/
+  * Source code : http://github.com/spring-projects/spring-xd
+  * Spring XD is docs are available [here](http://docs.spring.io/spring-xd/docs/1.0.0.RELEASE/reference/html)
+images:
+- name: kparikh_springxd_latest
+  source: kparikh/springxd:latest
+  category: Spring XD Nodes
+  type: Default
+  links:
+  - service: kparikh_zookeeper
+    alias: zk
+  - service: kparikh_mysql
+    alias: mysql
+  - service: kparikh_rabbitmq
+    alias: rabbitmq
+  - service: kparikh_redis
+    alias: redis
+- name: kparikh_zookeeper
+  source: kparikh/zookeeper:latest
+  category: Tracker
+  type: Default
+- name: kparikh_mysql
+  source: kparikh/mysql:latest
+  category: Database
+  type: Default
+- name: kparikh_rabbitmq
+  source: kparikh/rabbitmq:latest
+  category: Transport
+  type: Default
+- name: kparikh_redis
+  source: kparikh/redis:latest
+  category: Analytics
+  type: Default
+- name: kparikh_springxd_1
+  source: kparikh/springxd:latest
+  category: Spring XD Nodes
+  type: Default
+  ports:
+  - host_port: '9393'
+    container_port: '9393'
+    proto: TCP
+  links:
+  - service: kparikh_zookeeper
+    alias: zk
+  - service: kparikh_mysql
+    alias: mysql
+  - service: kparikh_rabbitmq
+    alias: rabbitmq
+  - service: kparikh_redis
+    alias: redis
