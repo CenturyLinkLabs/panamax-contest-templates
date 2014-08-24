@@ -88,6 +88,6 @@ images:
     alias: APP
   environment:
   - variable: NGROK_SUBDOMAIN
-    value: locomotive_cms
+    value: subdomain
   - variable: NGROK_AUTH
-    value: l0cZMJ4ZxTigI_5XXxS7
+    value: token
