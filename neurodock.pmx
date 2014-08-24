@@ -1,0 +1,88 @@
+---
+name: neurodock
+description: A scientific computing platform designed to facilitate reproducibility
+  in human brain imaging research.
+keywords: neuroimaging, mri, python
+type: Default
+documentation: |-
+  ### NeuroDock
+
+  NeuroDock demonstrates a system architecture that offers a scalable Platform as a Service for human brain imaging researchers. The design incorporates a core set of services as docker containers for persistence ([Virtuoso](https://github.com/openlink/virtuoso-opensource)), distributed queue management ([Celery](https://github.com/celery/celery) and [RabbitMQ](https://github.com/rabbitmq/rabbitmq-server), and monitoring ([Flower](https://github.com/mher/flower)), as well as Web services to execute computational workflow and track data provenance.
+
+  Note: there is zero effort to make this system secure - it is an academic project and should not be used in production.
+
+  * **Application Name:** NeuroDock
+
+  * **System Requirements:**
+
+  - Recommended 4 Cores, 8GB of RAM
+
+  * **Setup:**
+
+  - Increase number of cores and ram that panamax uses by default
+
+  * **Post-Run Instructions:**
+
+  - TODO
+
+  * **Port-Forwarding:**
+
+  - If using Virtual Box, edit the panamax vagrantfile at `~/.panamax/Vagrantfile` to include the following:
+
+  ```
+  config.vm.network "forwarded_port", guest: 8890, host: 8890 # Virtuoso
+  config.vm.network "forwarded_port", guest: 5555, host: 5555 # Flower
+  config.vm.network "forwarded_port", guest: 5000, host: 5000 # NiQuery
+  ```
+
+  * **Resources:**
+
+  - Neuroimaging Data Model: http://nidm.nidash.org/
+images:
+- name: nicholsn_docker-rabbitmq_latest
+  source: nicholsn/docker-rabbitmq:latest
+  category: Queue
+  type: Default
+- name: nicholsn_docker-flower
+  source: nicholsn/docker-flower:latest
+  category: Queue
+  type: Default
+  ports:
+  - host_port: '5555'
+    container_port: '5555'
+    proto: TCP
+  links:
+  - service: nicholsn_docker-rabbitmq_latest
+    alias: MQ
+- name: nicholsn_virtuoso
+  source: nicholsn/virtuoso:latest
+  category: Database
+  type: Default
+  ports:
+  - host_port: '8890'
+    container_port: '8890'
+    proto: TCP
+- name: nicholsn_niquery
+  source: nicholsn/niquery:latest
+  category: NIQ-Server
+  type: Default
+  ports:
+  - host_port: '5000'
+    container_port: '5000'
+    proto: TCP
+  links:
+  - service: nicholsn_docker-rabbitmq_latest
+    alias: MQ
+  environment:
+  - variable: FLASK_CONFIG
+    value: docker
+- name: nicholsn_niq-worker-fsl
+  source: nicholsn/niq-worker-fsl:latest
+  category: NIQ-Server
+  type: Default
+  links:
+  - service: nicholsn_docker-rabbitmq_latest
+    alias: MQ
+  environment:
+  - variable: FLASK_CONFIG
+    value: docker
