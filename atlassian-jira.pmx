@@ -1,0 +1,45 @@
+---
+name: Atlassian JIRA with MySQL
+description: JIRA 6.3.4 with MySQL 5.5.0
+keywords: atlassian, jira, mongodb
+type: Default
+documentation: |
+  Port Forwarding
+  -------------
+
+  In order to access JIRA after running you will need to setup a port forwarding rule. To view the GUI after launching the template, map your local host machine to port 9021. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 jira,tcp,,8080,,9021`
+
+  Setup
+  -----
+
+  The first time you access JIRA you will need to run through the setup wizard. To access JIRA and the setup wizard go to:
+
+  `http://localhost:8080`
+images:
+- name: coenhyde_atlassian-jira_latest
+  source: coenhyde/atlassian-jira:latest
+  category: Web Application
+  type: Default
+  ports:
+  - host_port: '9020'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: centurylink_mysql
+    alias: mysql
+  environment:
+  - variable: DATABASE_URL
+    value: mysql://jira:mysqlpass@mysql:3306/jira
+- name: centurylink_mysql
+  source: centurylink/mysql:5.5
+  category: Database
+  type: Default
+  environment:
+  - variable: MYSQL_DATABASE
+    value: jira
+  - variable: MYSQL_USER
+    value: jira
+  - variable: MYSQL_PASSWORD
+    value: mysqlpass
