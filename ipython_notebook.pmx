@@ -1,0 +1,14 @@
+---
+name: ipython notebook
+description: This is a basic ipython notebook.
+keywords: ipython python
+type: Default
+documentation: some docs go here
+images:
+- name: ipython_notebook_latest
+  source: ipython/notebook:latest
+  type: Default
+  ports:
+  - host_port: ''
+    container_port: '9999'
+    proto: TCP
