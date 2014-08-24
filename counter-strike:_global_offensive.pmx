@@ -1,0 +1,22 @@
+---
+name: 'Counter-Strike: Global Offensive'
+description: 'Easily create a Counter-Strike: Global Offensive server.'
+keywords: csgo, cs, valve
+type: Default
+documentation: |
+  ## About
+
+  Counter-Strike: Global Offensive (abbreviated as CS:GO) is an online tactical and first-person shooter developed by Valve Corporation and Hidden Path Entertainment, who also maintained Counter-Strike: Source after its release. It is the fourth game in the main Counter-Strike franchise.
+
+  ## How to use
+
+  1. Start the application
+  2. Connect using the application IP and port `27015`
+images:
+- name: kmallea_csgo_latest
+  source: kmallea/csgo:latest
+  category: App Tier
+  type: Default
+  expose:
+  - '27015'
+  - ''
