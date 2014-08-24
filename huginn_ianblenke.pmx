@@ -1,0 +1,112 @@
+---
+name: huginn_ianblenke
+description: A three tier Huginn deployment with haproxy, two Huggin application containers,
+  and a mysql container.
+keywords: huginn haproxy mysql
+type: Rails
+documentation: |+
+  Application Name: Huginn, an IFTTT / Zapier opensource alternative.
+
+  System Requirements:
+
+  Recommended 2 cores, 2G of RAM.
+
+  Setup:
+
+  There are two existing example web tier nodes in this template. To add new nodes, clone huginn_2 as it includes the DO_NOT_MIGRATE and INTENTIONALLY_SLEEP variables to prevent a race condition when initially provisioning the database tier. The docker hub / github README for [ianblenke/huginn](https://github.com/ianblenke/docker-huginn/) has additional setup instructions that will be helpful:
+
+  Post-Run Instructions:
+
+  Port-Forwarding:
+
+  The external access to this template is through the ports exposed via the tutum_haproxy node in the Load Balancing tier. By default, port 8081 is exposed. You may wish to change this to suit your needs.
+
+  For Example: If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+   VboxManage controlvm panamax-vm natpf1 rule,tcp,,8081,,8081 or use the [Panamax wiki page instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+  Resources:
+
+  The [ianblenke/docker-huginn](https://github.com/ianblenke/docker-huginn) github repository is a great resource for this template.
+
+  Additionally, the [ianblenke/huginn](https://registry.hub.docker.com/builds/github/ianblenke/huginn/) docker hub automatic build repository will show newer builds as the occur.
+
+  Until Huginn starts versioning releases, check back occasionally to see if there are any updated builds. Updates should be idempotent.
+
+images:
+- name: tutum_haproxy
+  source: tutum/haproxy:latest
+  category: Load Balancing Tier
+  type: Default
+  expose:
+  - '5000'
+  ports:
+  - host_port: '8081'
+    container_port: '5000'
+    proto: TCP
+  links:
+  - service: huginn1
+    alias: web1
+  - service: huginn2
+    alias: web2
+  environment:
+  - variable: PORT
+    value: 5000
+- name: huginn1
+  source: ianblenke/huginn:latest
+  category: Application Tier
+  type: Default
+  expose:
+  - '5000'
+  links:
+  - service: mysql
+    alias: MYSQL
+  environment:
+  - variable: DATABASE_USERNAME
+    value: huginn
+  - variable: DATABASE_PASSWORD
+    value: soverysecret
+  - variable: DATABASE_NAME
+    value: huginn
+  - variable: APP_SECRET_TOKEN
+    value: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  - variable: INVITATION_CODE
+    value: hug-muninn-for-me
+- name: huginn2
+  source: ianblenke/huginn:latest
+  category: Application Tier
+  type: Default
+  expose:
+  - '5000'
+  links:
+  - service: mysql
+    alias: MYSQL
+  environment:
+  - variable: DATABASE_USERNAME
+    value: huginn
+  - variable: DATABASE_PASSWORD
+    value: soverysecret
+  - variable: DATABASE_NAME
+    value: huginn
+  - variable: APP_SECRET_TOKEN
+    value: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  - variable: INVITATION_CODE
+    value: hug-muninn-for-me
+  - variable: DO_NOT_MIGRATE
+    value: 'true'
+  - variable: INTENTIONALLY_SLEEP
+    value: '30'
+- name: mysql
+  source: centurylink/mysql:latest
+  category: Database Tier
+  type: Default
+  expose:
+  - '3306'
+  environment:
+  - variable: MYSQL_DATABASE
+    value: huginn
+  - variable: MYSQL_USER
+    value: huginn
+  - variable: MYSQL_PASSWORD
+    value: soverysecret
+  - variable: MYSQL_ROOT_PASSWORD
+    value: evenmoresecret
