@@ -43,3 +43,4 @@ images:
     value: jira
   - variable: MYSQL_PASSWORD
     value: mysqlpass
+    
