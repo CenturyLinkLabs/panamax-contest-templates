@@ -1,0 +1,93 @@
+---
+name: locomotive_cms_gregory
+description: "This Locomotive Panamax template will set you up with a production ready
+  locomotive_cms instance. Ngrok will let you access it from the outside world.\r\n"
+keywords: cms, locomotive_cms, rails
+type: Rails
+documentation: |
+  #Locomotive_cms Panamax Template Instructions:
+
+  ##About
+
+  LocomotiveCMS is a free and open source content management system, or CMS, for websites. LocomotiveCMS's slick back-office editor makes managing site content easy for users and Wagon development tool makes coding these sites faster and more fun than ever for developers.
+
+
+  ## How to push a static template to your cms
+
+  [Please check the awesom documentation]()http://doc.locomotivecms.com/get-started)
+
+  To give you an idea, the documentation website has been made with [locomotive_cms & wagon it self](https://github.com/locomotivecms/documentation)
+
+
+  ## Panamax Setup instructions
+  In order to get it working properly, you'll have to change the ENV variables:
+
+  For the mails, by default it uses [sendgrid](https://sendgrid.com/user/signup) (which has a free plan)
+
+  You'll have to update the following Env variables:
+
+  * SENDGRID_USERNAME: your sendgrid username
+  * SENDGRID_PASSWORD: your sendgrid password
+  * SENDGRID_DOMAIN  : your sendgrid domain
+
+  For the fiel uploads by default locomotive_cms use [Amaszon S3](http://aws.amazon.com/s3/)
+
+  You'll have to udpate the following Env variables:
+
+  * S3_KEY_ID: your amazon key_id
+  * S3_SECRET_KEY: your anazon secret key
+  * S3_BUCKET: your amazon bucket - ex: images
+  * S3_BUCKET_REGION: your amamzon bucket region - ex: eu-west-1
+
+  [Ngrok](https://ngrok.com) is used to access your app to the outside world.
+  Using a domain is recommended.
+
+  You'll have to setup those Env variables:
+
+  * NGROK_AUTH: your ngrok authentication token
+  * NGROK_SUBDOMAIN: Name of the subdomain you wanna use. (make sure he doesn't exist) - ex: panamax_rocks (and then access it at: panamax_rocks.ngrok.com)
+images:
+- name: mongo_latest
+  source: mongo:latest
+  category: DB
+  type: Default
+- name: metakungfu_locomotive_cms
+  source: metakungfu/locomotive_cms:latest
+  category: WEB
+  type: Default
+  ports:
+  - host_port: '3000'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: mongo_latest
+    alias: mongodb
+  environment:
+  - variable: SENDGRID_USERNAME
+    value: foo
+  - variable: SENDGRID_PASSWORD
+    value: bar
+  - variable: SENDGRID_DOMAIN
+    value: domain
+  - variable: S3_KEY_ID
+    value: s3_key_id
+  - variable: S3_SECRET_KEY
+    value: secret
+  - variable: S3_BUCKET
+    value: images
+  - variable: S3_BUCKET_REGION
+    value: eu-west-1
+  - variable: SERVE_STATIC_ASSETS
+    value: 'true'
+- name: wizardapps_ngrok
+  source: wizardapps/ngrok:latest
+  category: proxy
+  type: Default
+  links:
+  - service: metakungfu_locomotive_cms
+    alias: APP
+  environment:
+  - variable: NGROK_SUBDOMAIN
+    value: subdomain
+  - variable: NGROK_AUTH
+    value: token
