@@ -1,0 +1,10 @@
+---
+name: OpenVAS
+description: OpenVAS - Open Source Vulnerability Assessment
+keywords: Vulnerability
+type: Default
+documentation: ''
+images:
+- name: mikesplain_openvas_latest
+  source: mikesplain/openvas:latest
+  type: Default
