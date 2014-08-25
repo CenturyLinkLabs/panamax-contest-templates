@@ -1,0 +1,65 @@
+---
+name: Docker Registry
+description: Your own Docker registry
+keywords: docker, registry
+type: Default
+documentation: |-
+  # Docker Registry
+
+  Your personal private [docker registry](https://github.com/docker/docker-registry) inside based on docker, docker management tool [Panamax](http://panamax.io/)!
+
+  ## System Requirements
+
+  * Computer - ✓
+  * Panamax - ✓
+
+  It seems that you have already installed Panamax on your computer;)
+
+  ## Setup
+
+  Just click on the button "Run Image".
+
+  ## Post-Run Instructions
+
+  Docker Registry can run in several flavors. The flavor of that template is `dev`. It is optimal for local setup.
+
+  More info can be found in the [documentation](https://github.com/docker/docker-registry#configuration-flavors)
+
+  ## Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  ```
+  VBoxManage controlvm panamax-vm natpf1 registry,tcp,,5000,,5000
+  ```
+
+  Where, `registry` is the friendly name of the rule, tcp is the protocol.
+
+  You can also use [these wiki instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox) to setup port forwarding.
+
+  ## Usage
+
+  To push to or pull from your own registry, you just need to set the URL to your private registry as the username.
+
+  First tag it accordingly and then push it. Assuming your registry is listening on localhost port 5000:
+  ```
+  $ docker tag mahnunchik/nodejs-runtime localhost:5000/nodejs-runtime
+  $ docker push localhost:5000/nodejs-runtime
+  ```
+  ## Resources
+
+  * [Docker](https://docker.com/)
+  * [Docker Registry](https://github.com/docker/docker-registry)
+  * [Panamax](http://panamax.io/)
+  * [HOW TO USE YOUR OWN REGISTRY](https://blog.docker.com/2013/07/how-to-use-your-own-registry/)
+images:
+- name: Docker Registry
+  source: registry:0.8.0
+  category: Registry
+  type: Default
+  ports:
+  - host_port: '5000'
+    container_port: '5000'
+    proto: TCP
+  environment:
+  - variable: SETTINGS_FLAVOR
+    value: dev
