@@ -20,7 +20,7 @@ documentation: |-
 
   scoped
   ======
-  this template, originally at https://github.com/CenturyLinkLabs/panamax-public-templates/blob/master/wordpress.pmx, has been modified as an example -- see https://github.com/fortheswarm/panamax-public-templates/blob/master/scope.pmx 
+  this template, originally at https://github.com/CenturyLinkLabs/panamax-public-templates/blob/master/wordpress.pmx, has been modified as an example -- see https://github.com/fortheswarm/panamax-contest-templates/blob/master/scope.pmx 
 
 images:
 - name: DB
