@@ -33,11 +33,11 @@ documentation: |-
   
   # Setup and access
   
-  Run this template under Panamax and you can access the load balanced WordPerss on http://localhost/
+  Run this template under Panamax and you can access the load balanced WordPress on http://localhost/
 
   # Scalability
 
-  You can add more WordPress instances to the cluster be add more sections described in the template under category: Application Tier, and add a corresponding link in category: Load Balancer Tier.
+  You can add more WordPress instances to the cluster by adding more sections described in the template under category: Application Tier, and add a corresponding link in category: Load Balancer Tier.
 
   # Note:
 
