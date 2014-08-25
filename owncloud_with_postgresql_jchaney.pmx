@@ -1,0 +1,59 @@
+---
+name: ownCloud with PostgreSQL jchaney
+description: ownCloud running on top of Nginx with support for PostgreSQL, MySQL,
+  and SQLite
+keywords: ownCloud, Nginx, PostgreSQL, MySQL, SQLite
+type: Default
+documentation: |-
+  Details
+  ========
+  This ownCloud configuration was built to run on top of Nginx & supports PostgreSQL, MySQL, or SQLite for the Database.
+
+  Database
+  ========
+  For a super easy setup, I would recommend using SQLite.. but if you need more performance, I would recommend using an external database. This template uses PostgreSQL by default.
+
+  Options
+  =====================
+  ### Nginx Configuration
+  Nginx runs on 80 **OR** 443 depending on whether or not you pass env variables for SSL. Make sure you bind of these externally. This template uses no SSL and port 80 by default.
+
+  ### Persistent storage for datastore
+  Attach host volume to /var/www/owncloud/data
+
+  ### SSL support
+  You will need to attach a host volume containing your SSL key and cert, and pass the path to each of those files in env variables SSL_KEY and SSL_CERT
+
+  Example: `SSL_KEY = /root/ssl/myssl.key`  & `SSL_CERT = /root/ssl/myssl.crt`
+
+  Post-Run Instructions
+  ======================
+
+  ### NOTE: Make sure you use the final hostname/FQDN you plan on accessing your ownCloud server with when connecting and doing initial configuration below. ownCloud will take the URL used to access the Installation Wizard and insert that into the config.php file for the ‘trusted_domains’ setting. Users will only be able to log into ownCloud when they point their browsers to a domain name listed in the ‘trusted_domains’ setting. An IPv4 address can be specified instead of a domain name. You may see a WebDav error on post-setup due to issues resolving it's own hostname. You can safely ignore this and go back to the /owncloud URL to login.
+
+  - Head to http://hostname/owncloud or https://hostname/owncloud
+  - Choose your own username and password
+  - db username is postgres
+  - db password can be left blank (unless you changed this before hand)
+  - db name can be whatever you want (I recommend using the name owncloud)
+  - use the database alias as the hostname, in this template, it is just: db
+
+  Resources
+  =========
+  [http://owncloud.org/](http://owncloud.org/)
+images:
+- name: postgres_latest
+  source: postgres:latest
+  category: Database
+  type: Default
+- name: jchaney_owncloud
+  source: jchaney/owncloud:latest
+  category: Web
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: postgres_latest
+    alias: db
