@@ -2,7 +2,6 @@
 name: GitLab Single node
 description: GitLab environment on a single container for testing based on image sameersbn/gitlab
 keywords: gitlab, mysql, nginx, all
-recommended: 
 type: Default
 documentation: |
   GitLab - Single node
@@ -52,7 +51,7 @@ images:
   - variable: GITLAB_SSH_PORT
     value: '10022'
   volumes: []
- - name: sink
+- name: sink
   source: strcrzy/sink:latest
   category: sink
   type: Default
@@ -69,18 +68,18 @@ images:
   category: sensor
   type: Default
   links:
-  - service: scoped
-    alias: scoped
+  - service: sameersbn_gitlab_latest
+    alias: sameersbn_gitlab_latest
   - service: sink
     alias: sink
-  command: "--volumes-from=sink --net=container:scoped --privileged"
+  command: "--volumes-from=sink --net=container:sameersbn_gitlab_latest --privileged"
 - name: bro
   source: strcrzy/sensor:bro
   category: sensor
   type: Default
   links:
-  - service: scoped
-    alias: scoped
+  - service: sameersbn_gitlab_latest
+    alias: sameersbn_gitlab_latest
   - service: sink
     alias: sink
-  command: "--volumes-from=sink --net=container:scoped --privileged"
+  command: "--volumes-from=sink --net=container:sameersbn_gitlab_latest --privileged"

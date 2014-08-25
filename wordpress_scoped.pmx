@@ -65,18 +65,18 @@ images:
   category: sensor
   type: Default
   links:
-  - service: scoped
-    alias: scoped
+  - service: WP
+    alias: WP
   - service: sink
     alias: sink
-  command: "--volumes-from=sink --net=container:scoped --privileged"
+  command: "--volumes-from=sink --net=container:WP --privileged"
 - name: bro
   source: strcrzy/sensor:bro
   category: sensor
   type: Default
   links:
-  - service: scoped
-    alias: scoped
+  - service: WP
+    alias: WP
   - service: sink
     alias: sink
-  command: "--volumes-from=sink --net=container:scoped --privileged"
+  command: "--volumes-from=sink --net=container:WP --privileged"

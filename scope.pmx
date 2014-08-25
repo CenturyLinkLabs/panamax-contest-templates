@@ -2,6 +2,7 @@
 name: scope
 description: scope template
 keywords: scope, bro, suricata, IDS, pcap
+recommended: 
 type: Default
 documentation: |-
   scope
