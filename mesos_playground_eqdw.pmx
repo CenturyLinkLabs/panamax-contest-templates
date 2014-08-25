@@ -1,0 +1,155 @@
+---
+name: Mesos Playground
+description: "This template sets up a single-node Apache Mesos cluster.\r\n\r\nMarathon
+  and Chronos frameworks are included, as is a web frontend for Zookeeper.\r\n\r\nAfter
+  following the steps in the \"Installation\" section below, you can immediately start
+  submitting jobs to Mesos via Marathon and/or Chronos, or by connecting your own
+  Framework via zk://localhost:2181/mesos."
+keywords: mesos,marathon,chronos,zk-web,zookeeper
+type: Apache
+documentation: |-
+  # Mesos Playground
+
+  This [Panamax](http://panamax.io/) template sets up a single-node [Apache Mesos](http://mesos.apache.org) cluster.
+
+  [Marathon](https://github.com/mesosphere/marathon) and [Chronos](https://github.com/airbnb/chronos) frameworks are included, as is [a web frontend for Zookeeper](https://github.com/qiuxiafei/zk-web).
+
+  After following the steps in the "Installation" section below, you can immediately start submitting jobs to Mesos via Marathon and/or Chronos, or by connecting your own Framework via `zk://localhost:2181/mesos`.
+
+  | Service                                            | Port                           |
+  |----------------------------------------------------|--------------------------------|
+  | [Mesos Master](http://mesos.apache.org/)           | [:5050](http://localhost:5050) |
+  | [Mesos Slave](http://mesos.apache.org/)            | [:5051](http://localhost:5051) |
+  | [Apache ZooKeeper](http://zookeeper.apache.org/)   | [:2181](http://localhost:2181) |
+  | [ZK-Web](https://github.com/qiuxiafei/zk-web)      | [:2182](http://localhost:2182) |
+  | [Marathon](https://github.com/mesosphere/marathon) | [:9000](http://localhost:9000) |
+  | [Chronos](https://github.com/airbnb/chronos)       | [:9001](http://localhost:9001) |
+
+
+  ## System Requirements
+
+  For best results, 4+ cores and 4GB RAM. You can probably fit it in less, but this template is pretty hungry. You can use `panamax reinstall` if using VirtualBox to increase the default limits of 1 core and 1GB.
+
+      panamax reinstall --memory=4096 --cpu=8
+
+  ## Setup
+
+  Just start the template and wait a bit for all the containers to fetch. It'll take a while.
+
+  ## Post-Run Instructions
+
+  Nothing really! In CoreOS, you can add more slaves on other nodes if you like:
+
+
+      docker run \
+        -p5051:5051 -e MESOS_MASTER=zk://[panamax ip]:2181/mesos \
+        redjack/mesos-slave
+
+  ## Port-Forwarding
+
+  There are several ports that you should forward to your localhost, which are itemized by service in the section above:
+
+      VBoxManage controlvm panamax-vm natpf1 zk-web,tcp,,2182,,2182
+      VBoxManage controlvm panamax-vm natpf1 mesos-master,tcp,,5050,,5050
+      VBoxManage controlvm panamax-vm natpf1 mesos-slave,tcp,,5051,,5051
+      VBoxManage controlvm panamax-vm natpf1 marathon,tcp,,9000,,9000
+      VBoxManage controlvm panamax-vm natpf1 chronos,tcp,,9001,,9001
+      VBoxManage controlvm panamax-vm natpf1 zookeeper,tcp,,2181,,2181
+
+
+  ## DIY Demo
+
+  1. Follow the instructions above, and wait for the services to boot up.
+  2. Visit [Marathon at localhost:9000](http://localhost:9000).
+  3. Click "New App", and set "Command" to `echo "hello, world"; sleep 20`, and set ID to a helpful name, like `sleeper`.
+  4. Scroll down and hit "Create".
+  5. Wait a few seconds and you will see your new app has been created.
+  6. Go to [Mesos Master's UI at localhost:5050](http://5050).
+  7. Notice the entry under "Active Tasks". Click the "Sandbox" link.
+  8. Click "stdout", and notice it's printed the text from step 3.
+  9. Explore!
+images:
+- name: redjack_mesos-master_latest
+  source: redjack/mesos-master:latest
+  category: Master
+  type: Default
+  expose:
+  - '5050'
+  ports:
+  - host_port: '5050'
+    container_port: '5050'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper
+    alias: zookeeper
+  environment:
+  - variable: MESOS_ZK
+    value: zk://zookeeper:2181/mesos
+- name: jplock_zookeeper
+  source: jplock/zookeeper:latest
+  category: Zookeeper
+  type: Default
+  expose:
+  - '2181'
+  ports:
+  - host_port: '2181'
+    container_port: '2181'
+    proto: TCP
+  volumes:
+  - host_path: "/data/zookeeper"
+    container_path: "/tmp/zookeeper"
+- name: redjack_mesos-slave
+  source: redjack/mesos-slave:latest
+  category: Slave
+  type: Default
+  expose:
+  - '5051'
+  ports:
+  - host_port: '5051'
+    container_port: '5051'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper
+    alias: zookeeper
+  environment:
+  - variable: MESOS_MASTER
+    value: zk://zookeeper:2181/mesos
+- name: superguenter_marathon
+  source: superguenter/marathon:latest
+  category: Frameworks
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '9000'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper
+    alias: zookeeper
+- name: tomaskral_chronos
+  source: tomaskral/chronos:latest
+  category: Frameworks
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '9001'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper
+    alias: zookeeper
+- name: nakosung_zk-web
+  source: nakosung/zk-web:latest
+  category: Zookeeper
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '2182'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper
+    alias: zookeeper
