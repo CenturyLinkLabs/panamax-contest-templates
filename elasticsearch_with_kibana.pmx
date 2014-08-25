@@ -1,0 +1,39 @@
+---
+name: ElasticSearch With Kibana
+description: ElasticSearch Linked to Kibana which is viewable from NGINX
+keywords: ''
+type: Default
+documentation: |-
+  Application Name: Visualize your logs via ElasticSearch's Kibana.
+
+  System Requirements: Recommended 2 Cores, 2GB of RAM. Disk: depending on log sizes.
+
+  Setup: ElasticSearch over port 9200, Kibana dashboard over.
+
+  Post-Run Instructions: Go http://localhost and have fun.
+images:
+- name: dockerfile_elasticsearch_latest
+  source: dockerfile/elasticsearch:latest
+  category: Data Node
+  type: Default
+- name: arcus_kibana
+  source: arcus/kibana:latest
+  category: UI
+  type: Default
+  expose:
+  - ''
+  - '9200'
+  links:
+  - service: dockerfile_elasticsearch_latest
+    alias: dockerfile_elasticsearch_latest
+- name: nginx
+  source: nginx:latest
+  category: Web Server
+  type: Default
+  ports:
+  - host_port: '9200'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: arcus_kibana
+    alias: arcus_kibana
