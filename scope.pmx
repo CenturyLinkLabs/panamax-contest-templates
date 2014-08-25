@@ -1,0 +1,93 @@
+---
+name: scope
+description: scope template
+keywords: scope, bro, suricata, IDS, pcap
+type: Default
+documentation: |-
+  scope
+  =====
+  scope is a collection of containers containing a suite of network 
+  security monitoring software, including:
+
+   - bro
+   - suricata
+   - elasticsearch. logstash, kibana
+   - initial logstash configs for suricata and bro
+
+  scope is a distribution of two containers: `sensor` and `sink`.
+  you can monitor whatever container(s) you like with it, and you can
+  mix other templates into this one by including its images and attaching 
+  the appropriate sensors to the template's images as is done here with 
+  `scoped`.
+
+  the `sensor` container has two flavors (tags): `suricata` and `bro`
+  each sensor should be run with the flags:
+
+    - `--volumes-from=sink`
+    - `--net=container:<container to monitor>`
+    - `--privileged`
+
+  (you can pass these with the custom docker run `command`)
+
+  note that when panamax ships with docker 1.2.0,  you will be able to drop the 
+  `--privileged` argument to the sensor container, and pass the more granular
+  `--cap-add=NET_RAW --cap-add=NET_ADMIN` instead
+
+  bro and suricata are configured to log to a shared volume, `/sink`, which
+  the `sink` container consumes via logstash into elasticsearch.
+
+  the `sink` container exposes kibana on port 8080. it has two rudimentary custom
+  dashboards installed at `/#/dashboard/file/bro-basic.json` and for bro and 
+  `/#/dashboard/file/suricata.json` for suricata. 
+
+  you will have to map this port and expose it yourself.
+
+
+images:
+- category: Scoped Container
+  name: scoped
+  source: centurylink/buildpack-runner:latest
+  description: buildpack-runner (scoped)
+  type: Default
+  expose: ['80']
+  ports:
+  - container_port: '80'
+  environment:
+  - variable: PORT
+    value: '80'
+  - variable: GIT_REPO
+    value:
+    required: true
+  command: '/start web'
+- name: sink
+  source: strcrzy/sink:latest
+  category: sink
+  type: Default
+  expose: ['8080']
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  volumes:
+  - host_path: ''
+    container_path: "/sink"
+- name: suricata
+  source: strcrzy/sensor:suricata
+  category: sensor
+  type: Default
+  links:
+  - service: scoped
+    alias: scoped
+  - service: sink
+    alias: sink
+  command: "--volumes-from=sink --net=container:scoped --privileged"
+- name: bro
+  source: strcrzy/sensor:bro
+  category: sensor
+  type: Default
+  links:
+  - service: scoped
+    alias: scoped
+  - service: sink
+    alias: sink
+  command: "--volumes-from=sink --net=container:scoped --privileged"
