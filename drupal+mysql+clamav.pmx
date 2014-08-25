@@ -1,5 +1,5 @@
 ---
-name: drupal+mysql+clamav
+name: drupal_mysql_clamav
 description: drupal+mysql+clamav
 keywords: ''
 type: Drupal
