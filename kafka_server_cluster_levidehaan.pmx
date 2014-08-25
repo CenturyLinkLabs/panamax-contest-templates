@@ -1,0 +1,129 @@
+---
+name: Kafka Server Cluster
+description: A deploy of a local Kafka cluster with 2 Kafka severs.
+keywords: Kafka
+type: Default
+documentation: |
+  
+  You will need to expose port 9050 and 9051 on virtualbox in order to connect with python.
+  
+  VBoxManage controlvm panamax-vm natpf1 kafka,tcp,,9050,,9051
+  
+  If you're just getting started with Kafka you can try out sending massages with Kafka Python.
+  Here are some directions to get you started.
+
+  You'll need to use the docker image to create a topic
+
+  In your shell type:
+
+  panamax ssh
+  
+  docker run -ti --link zookeeper:zk levidehaan/kafka:0.8.1 /bin/bash
+
+  /opt/kafka_2.8.0-0.8.1.1/bin/kafka-topics.sh --create --topic my_topic --partitions 4 --zookeeper $ZK_PORT_2181_TCP_ADDR --replication-factor 2
+
+  /opt/kafka_2.8.0-0.8.1.1/bin/kafka-console-consumer.sh --topic=my_topic --zookeeper=$ZK_PORT_2181_TCP_ADDR 
+
+  Now you can exit, type: exit
+  
+  Exit again to leave the Panamax shell
+
+
+  Install kafka-python
+  pip install kafka-python
+
+  ---------------------------
+
+  Kafka Emitter:
+  from kafka.client import KafkaClient
+  from kafka.consumer import SimpleConsumer
+  from kafka.producer import SimpleProducer, KeyedProducer
+
+  kafka = KafkaClient("localhost:9050")
+
+  producer = SimpleProducer(kafka)
+  producer.send_messages("my_topic", "some message")
+  producer.send_messages("my_topic", "this method", "is variadic")
+
+  producer = SimpleProducer(kafka, async=True)
+  producer.send_messages("my_topic", "async message")
+
+  producer = SimpleProducer(kafka, async=False,
+                            req_acks=SimpleProducer.ACK_AFTER_LOCAL_WRITE,
+                            ack_timeout=2000)
+
+  response = producer.send_messages("my_topic", "async message")
+
+  if response:
+      print(response[0].error)
+      print(response[0].offset)
+
+  producer = SimpleProducer(kafka, batch_send=True, batch_send_every_n=20, batch_send_every_t=60)
+
+  kafka.close()
+
+  -----------------------------------------------
+
+  Kafka Consumer:
+  from kafka.client import KafkaClient
+  from kafka.consumer import MultiProcessConsumer
+
+  kafka = KafkaClient("localhost:9050")
+
+  consumer = MultiProcessConsumer(kafka, "my-group", "my_topic", num_procs=2)
+
+  consumer = MultiProcessConsumer(kafka, "my-group", "my_topic",
+                                  partitions_per_proc=2)
+
+  print("Listening for Kafka")
+
+  for message in consumer:
+      print(message)
+
+  for message in consumer.get_messages(count=5, block=True, timeout=4):
+      print(message)
+images:
+- name: zookeeper
+  source: jplock/zookeeper:latest
+  category: Kafka
+  type: Default
+  ports:
+  - host_port: '49181'
+    container_port: '2181'
+    proto: TCP
+- name: kafka
+  source: levidehaan/kafka:0.8.1
+  category: Kafka
+  type: Default
+  ports:
+  - host_port: '9050'
+    container_port: '9050'
+    proto: TCP
+  links:
+  - service: zookeeper
+    alias: zk
+  environment:
+  - variable: BROKER_ID
+    value: 1
+  - variable: PORT
+    value: 9050
+  - variable: HOST_IP
+    value: 172.17.42.1
+- name: kafka2
+  source: levidehaan/kafka:0.8.1
+  category: Kafka
+  type: Default
+  ports:
+  - host_port: '9051'
+    container_port: '9051'
+    proto: TCP
+  links:
+  - service: zookeeper
+    alias: zk
+  environment:
+  - variable: BROKER_ID
+    value: 2
+  - variable: PORT
+    value: 9051
+  - variable: HOST_IP
+    value: 172.17.42.1
