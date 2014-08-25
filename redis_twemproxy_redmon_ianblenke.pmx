@@ -1,0 +1,84 @@
+---
+name: redis_twemproxy_redmon_ianblenke
+description: "A redmon application tier with a twemproxy redis proxy tier and a redis
+  server tier with three redis containers. The twemproxy container is etcd
+  and consul aware, as well as linked container aware. By setting ETCD_HOST to 172.17.42.1,
+  the redis servers and twemproxy port are stored in the panamax fleet's etcd key/value
+  store. Alternatively, by attaching a progrium/consul linkage, twemproxy will auto-discover
+  and use console for the key/value store."
+keywords: redis twemproxy redmon etcd consul
+type: Default
+documentation: |+
+  Application Name: [twemproxy](https://github.com/twitter/twemproxy), [redis](http://redis.io), and [redmon](https://github.com/steelThread/redmon) - an example of a scalable clustered redis backend with a redis web admin interface frontend.
+
+  System Requirements:
+
+  Recommended 2 cores, 2G of RAM.
+
+  Setup:
+
+  There are three existing example redis server tier nodes in this template. To add new nodes, add a dockerfile/redis server and link it to twemproxy.  The docker hub / github README for [ianblenke/twemproxy](https://github.com/ianblenke/docker-twemproxy/) has additional setup instructions that will be helpful.
+
+  Post-Run Instructions:
+
+  Port-Forwarding:
+
+  The external access to this template is through the ports exposed via the redmon node in the Load Balancing tier. By default, port 4567 is exposed. You may wish to change this to suit your needs.
+
+  For Example: If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+  VboxManage controlvm panamax-vm natpf1 rule,tcp,,4567,,4567 or use the [Panamax wiki page instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+  Resources:
+
+  The [ianblenke/docker-twemproxy](https://github.com/ianblenke/docker-twemproxy) github repository is a great resource for this template.
+
+  Additionally, the [ianblenke/twemproxy](https://registry.hub.docker.com/builds/github/ianblenke/twemproxy/) docker hub automatic build repository will show newer builds as they occur.
+
+images:
+- name: vieux_redmon
+  source: vieux/redmon:latest
+  category: Application Tier
+  type: Default
+  expose:
+  - '4567'
+  ports:
+  - host_port: '4567'
+    container_port: '4567'
+    proto: TCP
+  links:
+  - service: ianblenke_twemproxy
+    alias: twemproxy
+- name: ianblenke_twemproxy
+  source: ianblenke/twemproxy:latest
+  category: Redis Proxy Tier
+  type: Default
+  expose:
+  - '6379'
+  ports:
+  - host_port: '6379'
+    container_port: '6379'
+    proto: TCP
+  links:
+  - service: redis_1
+    alias: redis1
+  - service: redis_2
+    alias: redis2
+  - service: redis_3
+    alias: redis3
+  environment:
+  - variable: PORT
+    value: '6379'
+  - variable: ETCD_HOST
+    value: 172.17.42.1:4001
+- name: redis_1
+  source: redis:latest
+  category: Redis Server Tier
+  type: Default
+- name: redis_2
+  source: redis:latest
+  category: Redis Server Tier
+  type: Default
+- name: redis_3
+  source: redis:latest
+  category: Redis Server Tier
+  type: Default
