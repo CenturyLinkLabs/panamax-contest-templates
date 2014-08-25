@@ -1,0 +1,69 @@
+---
+name: Cacher
+description: Cache big downloads locally, to make installations faster
+keywords: caching, squid
+type: Default
+documentation: |+
+  ## HTTP Cache
+
+  Using Panamax lets you install lots of great software quickly.  But you have to wait while it downloads!
+
+  This is a cache designed for modern Internet connections & modern containerized architectures!
+  It will cache the big files that you download when you're using Panamax, Docker & Vagrant with CoreOS
+  (other caches won't cache big files).  It also doesn't cache small files which can be downloaded really quickly anyway,
+  as these would just take a lot of resources to track.
+
+  And it's easy to use: just point your apt-get / docker / vagrant / CoreOS / browser / everything at port 3128!
+
+  ## Instructions
+
+  Just run from Panamax!  If you're using VirtualBox/Vagrant, you'll need to tell VirtualBox to expose port 3128:
+  ```VBoxManage controlvm panamax-vm natpf1 rule3128,tcp,,3128,,3128```.
+
+  Then, try something like ```http_proxy=http://127.0.0.1:3128 apt-get update```; your cache should be up and running thanks
+  to the power of Panamax, CoreOS & Docker!
+
+  You will see the proxy logs integrated into the Panamax "Application Activity Log".
+
+  You can use the proxy from anywhere on your local network: you just need to change 127.0.0.1 to your machine's IP address.
+
+  ## Resources
+
+  [Using a proxy with apt-get](https://help.ubuntu.com/community/AptGet/Howto#Setting_up_apt-get_to_use_a_http-proxy)
+
+  [Using a proxy with docker](https://coreos.com/docs/launching-containers/building/customizing-docker/#use-an-http-proxy)
+
+  [Using a proxies with most command line apps](https://wiki.archlinux.org/index.php/proxy_settings)
+
+  [Using a proxy with Chrome](https://support.google.com/chrome/answer/96815?hl=en)
+
+  ##System Requirements
+
+  It's not very demanding, but needs plenty of disk space and does better with more RAM for caching.  Recommended: 1 Core, 512MB of RAM, 40GB of disk space.
+
+  ##Setup, Post-run & Port forwarding
+
+  Just run the template!  All the configuration options have been set to sensible defaults.
+
+  If you're on VirtualBox, you should expose port 3128 like this: ```VBoxManage controlvm panamax-vm natpf1 rule3128,tcp,,3128,,3128```
+
+  ##Testing
+
+  Try ```http_proxy=http://127.0.0.1:3128 apt-get update```, or ```http_proxy=http://127.0.0.1:3128 curl --verbose http://panamax.io/```
+
+  If these commands give you an error, something went wrong.  Please contact me and let me know!
+
+images:
+- name: Cache
+  source: justinsb/httpcacher:latest
+  category: Front-end Tier
+  type: Default
+  expose:
+  - '3128'
+  ports:
+  - host_port: '3128'
+    container_port: '3128'
+    proto: TCP
+  volumes:
+  - host_path: "/var/cache/http"
+    container_path: "/cachedata"
