@@ -3,7 +3,9 @@ name: ipython notebook
 description: This is a basic ipython notebook.
 keywords: ipython python
 type: Default
-documentation: |- The [IPython notebook](https://ipython.org) modified slightly to play well with panamax.
+documentation: |- 
+ The [IPython notebook](https://ipython.org) modified slightly to play well with panamax.
+ It has been set to use port 9999
 images:
 - name: IPython notebook for use with Panamax
   source: industrialintellect/docker-notebook:latest
