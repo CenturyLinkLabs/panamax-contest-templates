@@ -1,6 +1,6 @@
 ---
-name: GitLab Single node
-description: GitLab environment on a single container for testing based on image sameersbn/gitlab
+name: GitLab Single node (scoped)
+description: GitLab environment on a single container for testing based on image sameersbn/gitlab (scoped)
 keywords: gitlab, mysql, nginx, all
 type: Default
 documentation: |
