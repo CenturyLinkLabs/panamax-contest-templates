@@ -3,7 +3,7 @@ name: ipython notebook
 description: This is a basic ipython notebook.
 keywords: ipython python
 type: Default
-documentation: some docs go here
+documentation: |- The [IPython notebook](https://ipython.org) modified slightly to play well with panamax.
 images:
 - name: IPython notebook for use with Panamax
   source: industrialintellect/docker-notebook:latest
