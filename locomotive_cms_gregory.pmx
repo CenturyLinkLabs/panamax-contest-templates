@@ -21,6 +21,10 @@ documentation: |
   To give you an idea, the documentation website has been made with [locomotive_cms & wagon it self](https://github.com/locomotivecms/documentation)
   [This tutorial](http://doc.locomotivecms.com/making-blog) will drive you through all the steps to build a blog
 
+  ## System Requirements:
+
+  Minimum Recommanded: 1 Core, 512Mb of RAM
+  Best Performance: 1Core, 1GB of Ram
 
   ## Panamax Install instructions
 
