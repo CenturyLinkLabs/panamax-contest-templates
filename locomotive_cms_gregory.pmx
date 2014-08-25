@@ -7,7 +7,7 @@ type: Rails
 documentation: |
   #Locomotive_cms Panamax Template Instructions:
 
-  ![locomotive cms, brought to you by panamax](https://www.dropbox.com/s/s6j1nu0bdzk3oam/Screenshot%202014-08-24%2014.28.33.png?dl=0)
+  <img src="https://www.dropbox.com/s/s6j1nu0bdzk3oam/Screenshot%202014-08-24%2014.28.33.png?dl=0" alt="locomotive cms, brought to you by panamax" />
 
   ##About
 
@@ -21,6 +21,10 @@ documentation: |
   To give you an idea, the documentation website has been made with [locomotive_cms & wagon it self](https://github.com/locomotivecms/documentation)
   [This tutorial](http://doc.locomotivecms.com/making-blog) will drive you through all the steps to build a blog
 
+  ## System Requirements:
+
+  Minimum Recommanded: 1 Core, 512Mb of RAM
+  Best Performance: 1Core, 1GB of Ram
 
   ## Panamax Install instructions
 
