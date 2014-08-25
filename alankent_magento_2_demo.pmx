@@ -34,6 +34,8 @@ documentation: |-
 
   ##Resources:
 
+  [Blog Post](http://alankent.wordpress.com/2014/08/24/magento-2-demo-on-docker-and-panamax/)
+
   [Magento 2 Demo Docker Image](https://github.com/alankent/docker-magento2-demo-apache)
 
   [Magento](http://www.magento.com/)
