@@ -11,6 +11,6 @@ images:
   source: industrialintellect/docker-notebook:latest
   type: Default
   ports:
-  - host_port: ''
+  - host_port: '9999'
     container_port: '9999'
     proto: TCP
