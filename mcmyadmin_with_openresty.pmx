@@ -1,0 +1,106 @@
+---
+name: McMyAdmin with OpenResty
+description: McMyAdmin Minecraft Server with OpenResty Reverse Proxy and dynamically
+  generated (template configuration based) getting started guide website.
+keywords: minecraft, mcmyadmin, openresty, nginx
+type: Default
+documentation: |-
+  Details
+  ========
+  This template provides 2 containers.
+  - McMyAdmin + Minecraft Server
+  - OpenResty/Nginx Reverse Proxy
+
+  **McMyAdmin** is an easy to use, yet powerful web based administration tool for Minecraft servers. The free version will allow up to 10 players on the server. This can be upgraded to allow more.
+
+  ![McMyAdmin Server Status Screenshot](http://i.imgur.com/OTWuQE8.png)
+
+  **OpenResty** is a build of Nginx which provides Lua scripting capabilities. This is used to provide a reverse proxy to the McMyAdmin interface, optional SSL termination, and a dynamically generated (based on your Panamax template configuration) getting started guide for connecting to your Minecraft server. This serves as an excellent resource to point friends to who you have invited to play on your server.
+
+  ![Public getting started guide](http://i.imgur.com/vUjw8bl.png)
+
+  System Requirements
+  ======================
+  Recommended 2 Cores, and 2GB of RAM for 10 or less simultaneous players
+
+  McMyAdmin Container Setup
+  =========================
+
+  In both No-SSL and SSL configurations, the McMyAdmin container setup is the same.
+
+  - TCP Port 8080 needs to be exposed
+  - Minecraft server port should be bound externally. We recommend the default: 25565:25565
+  - Save configuration
+
+  ![McMyAdmin Port Setup](http://i.imgur.com/yfzzS48.png)
+
+  ## Optional Commands:
+  #### Set McMyAdmin password
+  - `+setpass newpassword`
+
+  #### Increase Java Memory for Minecraft Server
+  - `+java.memory 2048`
+
+  #### Chain commands together
+  - `-setpass newpassword +java.memory 2048`
+
+  OpenResty/Nginx Setup
+  =====================
+
+  ### IMPORTANT NOTE:
+  In both No-SSL and SSL configurations, OpenResty/Nginx must be linked back to the McMyAdmin container and use **MMA** as the alias name. This is required for the reverse proxy to work.
+
+  ![Container Link MMA](http://i.imgur.com/ZP8tneY.png)
+
+  ### No-SSL Configuration
+
+  - Add Port binding of 80:80
+
+  ### SSL Configuration
+
+  - Copy your own ssl.key and ssl.crt to some location on **host** (i.e. /home/jchaney/ssl)
+  - Add Port binding of 80:80 and 443:443
+  - Attach Volume from host directory containing SSL key and cert (i.e. /home/jchaney/ssl) to container location (i.e. /root/ssl)
+
+  ![Attach volume](http://i.imgur.com/BavSO5W.png)
+
+  - Add Environment Variables for SSL_KEY and SSL_CERT with paths to files in container volume
+
+  ![Environment Variables SSL](http://i.imgur.com/rMzrlTC.png)
+  - Save configuration
+
+  Post-Run Instructions
+  ======================
+  - Check http://hostname
+  - Check http://hostname/admin OR https://hostname/admin if SSL is setup
+  - Login to McMyAdmin at http[s]://hostname/admin with default username/password of: **admin/pass123** (unless you used -setpass option and changed it)
+
+  Port-Forwarding
+  ================
+  If your host is not directly exposed to the internet, you will need to port forward a few ports. If you don't have SSL, you will only need to open **TCP/80** and **TCP/25565**. If you setup SSL, you will also need **TCP/443**. For Virtual Box, please see [these instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox).
+
+  Resources
+  =========
+  [http://www.mcmyadmin.com/](http://www.mcmyadmin.com/)
+images:
+- name: jchaney_mcmyadmin_latest
+  source: jchaney/mcmyadmin:latest
+  category: Game/Web Server
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '25565'
+    container_port: '25565'
+    proto: TCP
+- name: jchaney_openresty-nginx
+  source: jchaney/openresty-nginx:latest
+  category: Reverse Proxy
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: jchaney_mcmyadmin_latest
+    alias: MMA
