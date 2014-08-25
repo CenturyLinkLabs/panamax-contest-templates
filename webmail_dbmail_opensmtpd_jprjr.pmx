@@ -1,0 +1,218 @@
+---
+name: Email with DBMail, OpenSMTPD, and webmail with RainLoop
+description: "This is an alternate take on an easy-to-deploy email system. Instead
+  of using Dovecot and Postfix, this image uses DBMail and OpenSMTPD.\r\n\r\nThis
+  template is NOT ready for any type of production use - this is using new images
+  that I'm still working on."
+keywords: email,webmail,dbmail,opensmtpd,rainloop,mysql
+type: Default
+documentation: |
+  # Email with DBMail, OpenSMTPD, and webmail with RainLoop
+
+  ## Current working status: it works!
+
+  I haven't tested this template with sending email outside of a VM, nor do
+  I recommend you try doing that! My OpenSMTPD image is using a very, very
+  dumb configuration - all email it recieves gets passed over to DBMail.
+
+  But you *can* create users and send email amongst them! So it's working
+  significantly better than my Dovecot/Postfix image.
+
+  This does not do any kind of spam filtering, check for user authentication,
+  etc. Do *not* try using this to send email outside of your VM!
+
+  ## Requirements
+
+  I recommend at least 1GB of RAM and two cores for good performance.
+
+  ## Application Setup
+
+  ### Environment variables
+
+  Setting up an email system is no easy task! First thing's first, here's the
+  list of **required** environment variables you'll need to deploy this template:
+
+  * `MYSQL_ROOT_PASSWORD` - This sets the root password on the `mysql` image.
+  * `MYSQL_USER` and `MYSQL_PASS` - Set this to `root` and whatever you put into `MYSQL_ROOT_PASSWORD`, respectively.
+  * `DB_USER` and `DB_PASS` - This is the username and password for accessing the user database.
+  * `ADMIN_EMAIL` - This does two things: it creates a default mail account, and it also drives what domain this mail system serves.
+  * `ADMIN_PASS` - This is the password for the `ADMIN_EMAIL` account.
+  * `NGINX` - Set this to `1` on the `jprjr/rainloop` image to use an embedded NGINX process.
+
+  Here's the list of what environment variables each container needs:
+
+  * `mysql` - `MYSQL_ROOT_PASSWORD`
+  * `jprjr/debian-dbmail` - `MYSQL_USER`, `MYSQL_PASS`, `DB_USER`,
+    `DB_PASS`, `ADMIN_EMAIL`, `ADMIN_PASS`
+  * `jprjr/opensmtpd` - none
+  * `jprjr/rainloop` - `NGINX`
+  * `jprjr/mailadmin` - `DB_USER`, `DB_PASS`
+
+  Some images have a few other variables available, but they're not needed
+  for this application.
+
+  ### Required links:
+
+  * `mysql` - None
+  * `jprjr/debian-dbmail` - Should be linked to `mysql` as `mysql`
+  * `jprjr/opensmtpd` - Should be linked to `dbmail` as `imap`
+  * `jprjr/rainloop` - Should be linked to `dbmail` and `opensmtpd`,
+    but the name doesn't matter.
+  * `jprjr/mailadmin` - Should be linked to `mysql` as `mysql`
+
+  ### Required volumes/files
+
+  * `mysql` - `/var/lib/mysql` for saving email, users, etc.
+
+  * `jprjr/mailadmin` - `/etc/ssh` for saving ssh keys, and
+    `/private/ssh/authorized_keys` to bring in your public key.
+
+  * `jprjr/rainloop` - `/var/lib/rainloop/data` for saving RainLoop
+    preferences, etc.
+
+  ### Port Forwarding
+
+  In order to use these services, you'll need to forward some ports.
+
+  If you're running Panamax on a local machine with VirtualBox, here's
+  some handy port-forwarding commands:
+
+  * SSH access to `jprjr/mailadmin`:
+    `VBoxManage controlvm panamax-vm natpf1 mailadmin,tcp,,10022,,10022`
+  * HTTP access to `jprjr/rainloop`:
+    `VBoxManage controlvm panamax-vm natpf1 webmail,tcp,,8080,,8080`
+  * IMAP access to `jprjr/debian-dbmail`:
+    `VBoxManage controlvm panamax-vm natpf1 imap,tcp,,143,,143`
+  * SMTP access to `jprjr/opensmtpd`:
+    `VBoxManage controlvm panamax-vm natpf1 smtp,tcp,,25,,25`
+
+  ## Post-Run Usage
+
+
+  ### jprjr/rainloop
+  Open a web browser to [localhost:8080/?admin](http://localhost:8080/?admin)
+  (or whatever you setup - the important part of the url is `?admin`), and
+  login as `admin` with the password `12345`.
+
+  In the rainloop administrative interface, click `Domains`, and add your
+  domain from the `ADMIN_EMAIL` environment variable. The DBMail and
+  OpenSMTPD containers are linked as `imap` and `smtp`, respectively, so
+  use those as your server names.
+
+  In the IMAP section, be sure to check "Use short form", and under SMTP,
+  make sure authentication is disabled.
+
+  Then navigate to [localhost:8080](http://localhost:8080) and start using
+  RainLoop! You should be able to login with whatever you set in the
+  `ADMIN_EMAIL` and `ADMIN_PASS` environment variables.
+
+  ### jprjr/mailadmin
+  Once the application has been restarted/rebuilt after placing your ssh public key
+  into `/home/core/jprjr-webmail/private/ssh/authorized_keys`, run:
+
+  `ssh -p 10022 mailadmin@localhost`
+
+  You'll have a shell where you can run a `dbmail-users` command for listing
+  users, adding new users, deleting users, and so on. Just typing `dbmail-users`
+  will show you how to use it.
+
+  Note: DBMail has "users" and "aliases", a user can have multiple aliases (aka
+  email addresses). The quick and easy way to add a new user with an email
+  address is:
+
+  `dbmail-users -a <login name> -w <password> -p sha256 -s <email address>`
+
+  ### jprjr/debian-dbmail and jprjr/opensmtpd
+
+  These work like any other mail server - configuring a mail client like
+  Thunderbird, Geary, etc is beyond the scope of this document.
+images:
+- name: mysql
+  source: mysql:latest
+  category: DB
+  type: Default
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: mysqlr00t
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/lib/mysql"
+    container_path: "/var/lib/mysql"
+- name: jprjr_debian-dbmail
+  source: jprjr/debian-dbmail:wheezy
+  category: Mail
+  type: Default
+  expose:
+  - '24'
+  ports:
+  - host_port: '143'
+    container_port: '143'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: MYSQL_USER
+    value: root
+  - variable: MYSQL_PASS
+    value: mysqlr00t
+  - variable: DB_USER
+    value: dbmail
+  - variable: DB_PASS
+    value: dbmailr00t
+  - variable: ADMIN_EMAIL
+    value: postmaster@nowhere.local
+  - variable: ADMIN_PASS
+    value: dbmail123456
+- name: jprjr_opensmtpd
+  source: jprjr/opensmtpd:latest
+  category: Mail
+  type: Default
+  ports:
+  - host_port: '25'
+    container_port: '25'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  - service: jprjr_debian-dbmail
+    alias: imap
+- name: jprjr_rainloop
+  source: jprjr/rainloop:latest
+  category: Web
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: jprjr_debian-dbmail
+    alias: imap
+  - service: jprjr_opensmtpd
+    alias: smtp
+  environment:
+  - variable: NGINX
+    value: '1'
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/lib/rainloop"
+    container_path: "/var/lib/rainloop/data"
+- name: jprjr_mailadmin
+  source: jprjr/mailadmin:latest
+  category: SSH
+  type: Default
+  ports:
+  - host_port: '10022'
+    container_port: '22'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: DB_USER
+    value: dovecot
+  - variable: DB_PASS
+    value: dbmailr00t
+  volumes:
+  - host_path: "/home/core/jprjr-webmail/etc/ssh"
+    container_path: "/etc/ssh"
+  - host_path: "/home/core/jprjr-webmail/private"
+    container_path: "/private"
