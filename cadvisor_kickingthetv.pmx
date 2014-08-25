@@ -1,0 +1,172 @@
+
+
+name: cAdvisor Suite
+description: A Docker Container Metrics Dashboard with Grafana, InfluxDB and Elasticsearch
+keywords: cAdvisor, grafana, influxdb, elasticsearch, all
+recommended: 
+type: Default
+documentation: |-
+  ## cAdvisor
+
+  [cAdvisor](https://github.com/google/cadvisor) is a daemon to analyze resource usage and performance characteristics of running containers.
+
+  ## influxDB
+
+  [influxDB](http://influxdb.com) is a distributed time series database.
+
+  ## Grafana
+
+  [Grafana](http://grafana.org) is metrics dashboard and graph editor for Graphite, InfluxDB & OpenTSDB.
+
+  ## Elasticsearch
+
+  [elasticsearch](http://www.elasticsearch.org/) is an end-to-end search and analytics platform.
+
+  ## Why this template?
+
+  By default cAdvisor only stores recent data in memory. Although it supports storing historical data using an influxDB backend, setting it up is not intutitive. This template handles that process for you. In order to do this, it makes use of a custom cAdvisor Docker Image from Tifayuki. His enhanced cAdvisor image automatically configures itself to write to InfluxDB when it detects it is linked to an InfluxDB container. This is unlike Google's image which has to be setup manually at runtime.
+
+  ## System Requirements
+
+  * *RAM:* 512 MB Minimum, 1GB Recommended, 2GB Preferred
+  * *Cores:* 1 core Minimum, 2 core Recommended
+
+  ## Setup & Access
+
+  After succesfully deploying this template, you'll have to forward some ports.
+
+  ### Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rules:
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8888,,8080
+  ```
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,80,,80
+  ```
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,9200,,9200
+  ```
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8086,,8086
+  ```
+
+  Rule below is only required if you want to access InfluxDB web interface:
+
+  ```
+  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8083,,8083
+  ```
+
+  Alternatively, you can do it using the GUI as explained [here](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox).
+
+  Assuming you use the port forwarding rules above:
+
+  * To access Grafana: [http://localhost:80/](http://localhost:80/) Username is: `adminGrafana` Password: `passGrafana`
+
+  Note: I've noticed my browser hangs after logging in, if it happens to you, simply refresh the page.
+
+  If you want to access the other services directly: 
+
+  * To access cAdvisor directly: [http://localhost:8888](http://localhost:8888)
+  * To access InfluxDB directly: [http://localhost:8083](http://localhost:8083) Username is: `root` Password: `root`
+
+  ### Miscellaneous 
+
+  * The behavior of cAdvisor seems to be different on CoreOS than on other systems. Will investigate and update template if necessary.
+  * I've written a couple of blog posts about [cAdvisor](http://blog.tutum.co/2014/08/07/using-cadvisor-to-monitor-docker-containers/) and this [template](blog.tutum.co/2014/08/24/panamax-application-template-with-cadvisor-elasticsearch-grafana-and-influxdb/).
+
+authors: 
+- Bryan Lee <bryan.lee08@gmail.com>
+images:
+- category: Database
+  name: influxdb
+  source: tutum/influxdb:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '8086'
+    container_port: '8086'
+  - host_port: '8083'
+    container_port: '8083'
+  links: []
+  environment:
+  - variable: PRE_CREATE_DB
+    value: cadvisor
+  volumes: []
+- category: Application
+  name: cadvisor
+  source: tifayuki/cadvisor:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+  links:
+  - service: influxdb
+    alias: influxdb
+  environment:
+  - variable: DB_NAME
+    value: cadvisor
+  - variable: DB_USER
+    value: root
+  - variable: DB_PASS
+    value: root
+  volumes:
+  - host_path: "/var/run"
+    container_path: "/var/run"
+  - host_path: "/sys/fs/cgroup/"
+    container_path: "/sys/fs/cgroup/"
+  - host_path: "/var/lib/docker/"
+    container_path: "/var/lib/docker/"
+- category: Analytics
+  name: elasticsearch
+  source: tutum/elasticsearch
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '9200'
+    container_port: '9200'
+  links: []
+  environment:
+  - variable: ELASTICSEARCH_USER
+    value: admin
+  - variable: ELASTICSEARCH_PASS
+    value: password
+  volumes: []
+- category: Frontend
+  name: grafana
+  source: tutum/grafana:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '80'
+    container_port: '80'
+  links: []
+  environment:
+  - variable: INFLUXDB_HOST
+    value: localhost
+  - variable: INFLUXDB_PORT
+    value: 8086
+  - variable: INFLUXDB_NAME
+    value: cadvisor
+  - variable: INFLUXDB_USER
+    value: root
+  - variable: INFLUXDB_PASS
+    value: root
+  - variable: ELASTICSEARCH_HOST
+    value: localhost
+  - variable: ELASTICSEARCH_PORT
+    value: 9200
+  - variable: ELASTICSEARCH_USER
+    value: admin
+  - variable: ELASTICSEARCH_PASS
+    value: password
+  - variable: HTTP_USER
+    value: adminGrafana
+  - variable: HTTP_PASS
+    value: passGrafana
+  volumes: []
