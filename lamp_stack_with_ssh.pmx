@@ -1,0 +1,66 @@
+---
+name: LAMP stack with SSH
+description: Uses MySQL, Apache/PHP and SSH to create a containerized LAMP stack for
+  building PHP websites.  Log in using SSH to edit the shared files on the Apache/PHP
+  container or install mysql-client to access the MySQL database directly.
+keywords: LAMP scratch ssh apache php
+type: LAMP
+documentation: |
+  ### Documentation for Panamax LAMP stack
+
+  This template is intended to be used by a developer to start with a blank LAMP (Linux Apache MySQL PHP) stack.  Begin by using SSH to access the files located in '/app' and/or install mysql-client to access the MySQL database directly.
+
+  * **Port-Forwarding:** In order to access SSH or the Apache website ports need to be forwarded to your local machine.  The following commands should be all that is required.
+    `VboxManage controlvm panamax-vm natpf1 rule1,tcp,,22222,,22222`
+    `VboxManage controlvm panamax-vm natpf1 rule2,tcp,,8997,,8081`
+
+  To forward the ports using the GUI, please take a look at the [linked documentation.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+  After forwarding these ports, SSH will be accessible from localhost:222222 and Apache will be accessible from localhost:8997.
+
+  * **Post-Run Instructions:** After running the template and forwarding ports, access SSH by running `ssh -p 22222 root@localhost`.  When prompted for the password, look in the SSH containers log history.  The password should appear like this: `Aug 21 15:51:39 docker and enter the root password 'eKR4TUsBeKdG' when prompted`
+
+  Now that you are logged into SSH, go to the /app directory and start creating the files that you want to show up on the Apache web server.  For example:
+
+  `echo "<?php echo 'Hello World!' ?>" > /app/index.php`
+
+  If all goes well you should then see your new file at the location `localhost:8997/index.php`.
+
+  You can also access MySQL directly from SSH by first installing mysql-client.  For example:
+
+  `apt-get update && apt-get install -y mysql-client` to install the mysql command line client and then  `mysql -h mysql` to connect to MySQL.
+
+  Notice that `mysql` is the correct hostname for the MySQL database.
+images:
+- name: centurylink_mysql_5.5
+  source: centurylink/mysql:5.5
+  category: MySQL
+  type: Default
+- name: centurylink_apache-php
+  source: centurylink/apache-php:latest
+  category: Apache/PHP
+  type: Default
+  ports:
+  - host_port: '8081'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: centurylink_mysql_5.5
+    alias: mysql
+  volumes:
+  - host_path: "/home/core/app"
+    container_path: "/app"
+- name: tutum_ubuntu
+  source: tutum/ubuntu:latest
+  category: SSH
+  type: Default
+  ports:
+  - host_port: '22222'
+    container_port: '22'
+    proto: TCP
+  links:
+  - service: centurylink_mysql_5.5
+    alias: mysql
+  volumes:
+  - host_path: "/home/core/app"
+    container_path: "/app"
