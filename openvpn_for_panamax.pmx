@@ -1,0 +1,29 @@
+---
+name: OpenVPN for Panamax
+description: Simply running an OpenVPN server using Panamax
+keywords: openvpn, vpn
+type: Default
+documentation: |-
+  ## How to use
+
+  1. Download the OpenVPN connection settings at: `http://[container-ip]:8080/`
+  2. Login using your mobile or computer using the downloaded settings
+  3. Done!
+images:
+- name: jpetazzo_openvpn_latest
+  source: jpetazzo/openvpn:latest
+  category: App tier
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  - host_port: '443'
+    container_port: '443'
+    proto: TCP
+  - host_port: '1194'
+    container_port: '1194'
+    proto: UDP
+  environment:
+  - variable: CID
+    value: docker run -d --privileged -p 1194:1194/udp -p 443:443/tcp jpetazzo/openvpn
