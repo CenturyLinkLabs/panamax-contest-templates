@@ -1,12 +1,12 @@
 ---
 name: Magento 2 Demo
-description: This Panamax template contains an alpha build of Magento 2.
-  It is an experiment to see how well Panamax can be used to allow people
-  to grab a copy of the next Magento release and get it up and running
-  without having to worry about constantly changine installation instructions.
-keywords: Magento 2 alpha Panamax MySQL Demo
-type: Magento2
-documentation: |+
+description: This Panamax template contains an alpha build of Magento 2. It is an
+  experiment to see how well Panamax can be used to allow people to grab a copy of
+  the next Magento release and get it up and running without having to worry about
+  constantly changine installation instructions.scription
+keywords: Magento2, alpha, demo
+type: Magento
+documentation: |-
   ## Application Name:
 
   Magento 2 0.1.0-alpha89 Demonstration
@@ -37,26 +37,11 @@ documentation: |+
   [Magento 2 Demo Docker Image](https://github.com/alankent/docker-magento2-demo-apache)
 
   [Magento](http://www.magento.com/)
-
 images:
-- name: mysql
-  source: mysql:latest
-  category: Database
-  type: Default
-  environment:
-  - variable: MYSQL_ROOT_PASSWORD
-    value: admin
-- name: docker-magento2-demo-apache:0.1.0-alpha89
+- name: alankent_docker-magento2-demo-apache_latest
   source: alankent/docker-magento2-demo-apache:latest
-  category: Web Server
+  category: Application Tier
   type: Default
-  environment:
-  - variable: PUBLIC_HOST
-    value: yourserver.com
-  - variable: MYSQL_USER
-    value: root
-  - variable: MYSQL_PASSWORD
-    value: admin123
   ports:
   - host_port: '80'
     container_port: '80'
@@ -64,3 +49,19 @@ images:
   links:
   - service: mysql
     alias: mysql
+  environment:
+  - variable: MYSQL_USER
+    value: root
+  - variable: MYSQL_PASSWORD
+    value: admin
+  - variable: PUBLIC_HOST
+    value: localhsot
+- name: mysql
+  source: mysql:latest
+  category: Database Tier
+  type: Default
+  expose:
+  - '3306'
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: admin
