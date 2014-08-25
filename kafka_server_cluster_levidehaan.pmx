@@ -4,11 +4,17 @@ description: A deploy of a local Kafka instance with 2 instances
 keywords: Kafka
 type: Default
 documentation: |
+  
+  You will also need to expose port 9050 and 9051 on virtualbox in order to connect with python.
+  
+  ````VBoxManage controlvm panamax-vm natpf1 kafka,tcp,,9050,,9051````
+  
   Install kafka-python
   pip install kafka-python
 
   ---------------------------
 
+````
   Kafka Emitter:
   from kafka.client import KafkaClient
   from kafka.consumer import SimpleConsumer
@@ -36,9 +42,11 @@ documentation: |
   producer = SimpleProducer(kafka, batch_send=True, batch_send_every_n=20, batch_send_every_t=60)
 
   kafka.close()
+````
 
   -----------------------------------------------
 
+````
   Kafka Consumer:
   from kafka.client import KafkaClient
   from kafka.consumer import MultiProcessConsumer
@@ -57,6 +65,7 @@ documentation: |
 
   for message in consumer.get_messages(count=5, block=True, timeout=4):
       print(message)
+````
 images:
 - name: zookeeper
   source: jplock/zookeeper:latest
