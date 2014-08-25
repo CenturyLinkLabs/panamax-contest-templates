@@ -5,8 +5,8 @@ keywords: ipython python
 type: Default
 documentation: some docs go here
 images:
-- name: ipython_notebook_latest
-  source: ipython/notebook:latest
+- name: IPython notebook for use with Panamax
+  source: industrialintellect/docker-notebook:latest
   type: Default
   ports:
   - host_port: ''
