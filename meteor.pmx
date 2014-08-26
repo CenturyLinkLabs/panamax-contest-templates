@@ -1,0 +1,35 @@
+---
+name: Meteor App
+description: Simple Meteor App (the built-in todolist)
+keywords: ''
+type: NodeJS
+documentation: ''
+images:
+- name: mongo
+  source: mongo:latest
+  category: DB Tier
+  type: Default
+  expose:
+  - '27017'
+  ports:
+  - host_port: '27017'
+    container_port: '27017'
+    proto: TCP
+- name: waitingkuo_pmx-meteor
+  source: waitingkuo/pmx-meteor:latest
+  category: Web Tier
+  type: Default
+  expose:
+  - '27017'
+  ports:
+  - host_port: '27017'
+    container_port: '27017'
+    proto: TCP
+  links:
+  - service: mongo
+    alias: mongo
+  environment:
+  - variable: MONGO_URL
+    value: mongodb://localhost/meteor
+  - variable: ROOT_URL
+    value: http://localhost
