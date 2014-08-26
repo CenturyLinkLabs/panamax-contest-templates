@@ -1,0 +1,21 @@
+name: Stellard
+description: a template for running Stellard, Stellar's P2P server
+keywords: stellar, bitcoin, cryptocurrency
+recommended: false
+type: Default
+documentation: |
+  Oddbloke/stellard
+  =========================
+  This template runs Stellar's stellard, the reference P2P server.
+images:
+- name: Stellard
+  source: oddbloke/stellard:latest
+  description: My Stellard container
+  type: Default
+  ports:
+  - host_port: '9001'
+    container_port: '9001'
+  - host_port: '9002'
+    container_port: '9002'
+  links: []
+  volumes: []
