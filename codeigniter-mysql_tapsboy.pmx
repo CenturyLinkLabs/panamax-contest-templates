@@ -1,0 +1,41 @@
+
+name: Codeigniter with MySQL
+description: Codeigniter container linked to a MySQL container
+keywords: php, codeigniter, mysql
+documentation: |
+  Codeigniter with MySQL
+  ============================
+  Install latest Codeigniter, Apache, PHP.
+  Run VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8997,,8080 to port forward.
+  
+authors:
+- 'tapsboy@gmail.com'
+type: LAMP
+images:
+- name: DB
+  source: centurylink/mysql:5.5
+  description: MySQL
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: password1234
+  ports:
+  - host_port: 3306
+    container_port: 3306
+  category: DB Tier
+  type: mysql
+- name: Web
+  source: tapsboy/docker-codeigniter:latest
+  description: Codeigniter application
+  environment:
+  - variable: DB_PASSWORD
+    value: password1234
+  - variable: DB_NAME
+    value: codeigniter
+  links:
+  - service: DB
+    alias: DB_1
+  ports:
+  - host_port: 8080
+    container_port: 80
+  category: Web Tier
+  type: Default
