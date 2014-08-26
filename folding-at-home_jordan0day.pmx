@@ -34,4 +34,4 @@ images:
   - variable: TEAM
     value: '0'
   - variable: POWER
-    value: '0'
+    value: 'medium'
