@@ -1,0 +1,60 @@
+---
+name: errbit_andrewcarpenter
+description: A Rails and MongoDB application for collecting and managing errors from
+  other applications
+keywords: rails, mongodb
+type: Rails
+documentation: |-
+  This template includes an [Errbit](http://errbit.github.io/errbit/) server for collecting and managing errors from other applications.
+
+  The Errbit application is a minor fork that contains the Dockerfiles and some basic configuration. The Dockerfile is based on Phusion's [Passenger-Docker](https://github.com/phusion/passenger-docker) base image, and can be found on [GitHub](https://github.com/andrewcarpenter/errbit)
+
+  This Panamax template makes use of Docker links so the Rails application can talk to the MongoDB database without exposing unnecessary ports. It also mounts a volume, so the MongoDB database will be persisted across restarts.
+
+  ### Accessing the Application ###
+
+  After launching the template, in order to access the application you'll need to forward port 7000; with VirtualBox, run the following command on the VirtualBox host (not the CoreOS instance, but your primary OS):
+
+  `VBoxManage controlvm panamax-vm natpf1 errbit,tcp,,7000,,7000`
+
+  (Note that a restart of VirtualBox can result in the loss of these values; simply run the command again.)
+
+  Then open up [http://127.0.0.1:7000/](http://127.0.0.1:7000/) in your browser and log in. The default username is `errbit@errbit.example.com` and the default password is `password`.
+
+  ### System Requirements ###
+
+  As a Rails application, memory use isn't particularly light. I would recommend at least 2GB of RAM and 1-2 cores.
+
+  ### Optional Configuration ###
+
+  In order to aid troubleshooting and exploration, you can add a `ENABLE_INSECURE_SSH_KEY` environmental variable (with a value like '1') to the app container; this will allow you to SSH in to the errbit container following the [general baseimage-docker instructions](https://github.com/phusion/passenger-docker#login)
+
+  If using for anything real, you'll need to generate a new `SECRET_TOKEN` environmental variable so Rails can secure the session cookie.
+
+  In addition to the environmental variables specified above, most of the [Errbit variables](https://github.com/errbit/errbit/blob/master/docs/ENV-VARIABLES.md) are supported.
+
+  ### Comments ###
+
+  As an application designed to run on Heroku, much of the needed configuration could already be controlled via environmental variables. Here we're seeing again the value of a '12 factor app' having applications well beyond Heroku and other PAAS.
+images:
+- name: andrewcarpenter_errbit
+  source: andrewcarpenter/errbit:latest
+  category: app
+  type: Default
+  ports:
+  - host_port: '7000'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: dockerfile_mongodb
+    alias: mongodb
+  environment:
+  - variable: SECRET_TOKEN
+    value: change_me_1faa8b8068b6f6580fe05885a84975aa8277f0603794da7dd4e9503cd0aa03e
+- name: dockerfile_mongodb
+  source: dockerfile/mongodb:latest
+  category: database
+  type: Default
+  volumes:
+  - host_path: "/home/core/errbit_mongodb_data"
+    container_path: "/data/db"
