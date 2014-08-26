@@ -1,0 +1,35 @@
+---
+name: ipython notebook
+description: This is a basic ipython notebook.
+keywords: ipython python
+type: Default
+documentation: |- 
+ The [IPython notebook](http://ipython.org) modified slightly to play well with panamax.
+
+ It has been set to use port 9999
+
+ It uses a self-signed certificate and sets the default password to `panamax`.
+
+ You can set PASSWORD environment variable in the applications management screen.
+
+ You will need to set the following rule to forward to the panamax-vm.
+
+ ```VBoxManage controlvm panamax-vm natpf1 ipython,tcp,,9999,,9999```
+
+ This notebook includes a few libraries not found found in the default ipython/notebook image.
+
+ You have:
+ [numpy](http://www.numpy.org/) python matrix and linear algebra library.
+ [pandas](http://pandas.pydata.org/) a data analyis frame work
+ [psycopg2](http://initd.org/psycopg/) postgresql database access
+
+ This should be enough to get you started on a basic python data analysis stack.
+
+images:
+- name: IPython Pandas Panamax
+  source: industrialintellect/docker-notebook:latest
+  type: Default
+  ports:
+  - host_port: '9999'
+    container_port: '9999'
+    proto: TCP
