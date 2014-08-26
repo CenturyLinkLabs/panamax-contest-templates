@@ -23,8 +23,9 @@ documentation: |
 
   ## System Requirements:
 
-  Minimum Recommanded: 1 Core, 512Mb of RAM
-  Best Performance: 1Core, 1GB of Ram
+  Minimum Recommanded: 1 Core, 1Gb of RAM
+  Best Performance: 2Core, 2Gb of Ram
+  Optimal Performance: 4Core, 4Gb of RAM
 
   ## Panamax Install instructions
 
