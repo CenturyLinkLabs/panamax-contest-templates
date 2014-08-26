@@ -1,0 +1,42 @@
+---
+name: mean_stack_superstructor
+description: MEAN.io stack as a Panamax template.
+keywords: mean.io mean node.js nodejs mongodb
+type: NodeJS
+documentation: |
+  MEAN.io Stack Template
+  ===================
+
+  1. Follow the [MEAN Quick Install](https://github.com/linnovate/mean#quick-install) and commit the result to a git repository
+  1. Change the `GIT_REPO` environment variable of the `mahnunchik_nodejs-runtime` image to the git url of your repository
+  1. VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8080,,8080
+  1. You now have a working MEAN stack with MongoDB, Node.js and HAProxy as a reverse proxy front-end on http://localhost:8080
+images:
+- name: mongo_latest
+  source: mongo:latest
+  category: Database
+  type: Default
+- name: mahnunchik_nodejs-runtime
+  source: mahnunchik/nodejs-runtime:latest
+  category: Application
+  type: Default
+  links:
+  - service: mongo_latest
+    alias: mongo_latest
+  environment:
+  - variable: GIT_REPO
+    value: https://github.com/linnovate/mean.git
+- name: tutum_haproxy
+  source: tutum/haproxy:latest
+  category: Reverse Proxy
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: mahnunchik_nodejs-runtime
+    alias: mahnunchik_nodejs-runtime
+  environment:
+  - variable: PORT
+    value: '8080'
