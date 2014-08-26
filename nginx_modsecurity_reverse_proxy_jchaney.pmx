@@ -1,0 +1,87 @@
+---
+name: Nginx ModSecurity Reverse Proxy jchaney
+description: 'Nginx Reverse Proxy with ModSecurity and OWASP TOP 10 firewall rule
+  set '
+keywords: nginx, modsecurity, owasp, security, firewall, web app firewall
+type: Default
+documentation: |-
+  Details
+  ========
+  This template provides a very fast, SSL capable, and security-focused reverse proxy for your Docker web apps. This Nginx build was stripped of all core modules except those needed for SSL, SPDY, and reverse proxy. Mod_Security was compiled into this custom Nginx build to provide you with optional (blocking or logging) web app firewall capabilities. The OWASP TOP 10 rules are in included with this build.
+
+  But the best part is that it is very flexible for attaching to your existing web applications. This was accomplished through the use of Docker environment variables and container linking, which Panamax excels at setting up.
+
+  This template serves as a demo of it's simple configuration with a very basic web site. The web app is running on port 8000 and Nginx proxies the requests from 80 to it. However, this tool is ideal for database driven applications that may be vulnerable to XSS, SQLi, etc.
+
+  System Requirements
+  ======================
+  The base configuration uses 1 worker process and 1024 worker connections. If you have a more capable server, you can bump this up by adding the NXWP (worker-process) and NXWC (worker-connection) environment variables with your desired values.
+
+  Configuration Options
+  =========================
+
+  ### Required (note: please use all CAPS for these two env var values)
+
+  After linking this container to your web app container, you will want to add two environment variables
+  - APP_ALIAS  (value should be the name of your link alias)
+  - APP_PORT   (value should be the exposed port your web app is running on)
+
+  ### SSL
+  In order to provide your cert and keys, you will need to map a host volume to the container with your files in it. Once you have done that you will need to add two environment variables
+  - SSL_CERT (value should be container volume path to cert file)
+  - SSL_KEY  (value should be container volume path to key file)
+
+  ### WAF Blocking
+  Without doing anything else, you will get automatic WAF logging to: /var/log/nginx/modsec_audit.log. If you would like to put your reverse proxy in blocking mode you will need to add another environment variable:
+  - WAFDROP  (value can be anything)
+
+  ### Other Nginx Options
+  - NXWP    (changes default worker process value)
+  - NXWC    (changes default worker connections value)
+  - FQDN    (add your fully-qualified domain here)
+
+  Other info
+  ===========
+  - You may run your own app on any port you like, you only need to expose the port though, do not bind it, especially if it's using the same ports as this container.
+  - If you are not using SSL, you only need to expose port 80. If you are running SSL, you should expose 80 and 443. The Nginx config will re-route all port 80 requests to port 443 and set HSTS headers.
+
+  Post-Run Instructions
+  ======================
+  - Make sure you can still access your website.
+
+  Port-Forwarding
+  ================
+  If your host is not directly exposed to the internet, you will need to port forward a few ports. If you don't have SSL, you will only need to open **TCP/80**. If you setup SSL, you will also need **TCP/443**. For Virtual Box, please see [these instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox).
+
+  Resources
+  =========
+  [http://nginx.org/](http://nginx.org/)
+  [https://www.modsecurity.org/](https://www.modsecurity.org/)
+  [https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project](https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project)
+images:
+- name: jchaney_modsecurity
+  source: jchaney/modsecurity:latest
+  category: Web App Firewall Reverse Proxy
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: jchaney_webtest
+    alias: webtest
+  environment:
+  - variable: APP_ALIAS
+    value: WEBTEST
+  - variable: APP_PORT
+    value: '8000'
+  - variable: FQDN
+    value: waftest.chaney.io
+  - variable: WAFDROP
+    value: 'YES'
+- name: jchaney_webtest
+  source: jchaney/webtest:latest
+  category: Web
+  type: Default
+  expose:
+  - '8000'
