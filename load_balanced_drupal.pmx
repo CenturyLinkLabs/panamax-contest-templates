@@ -1,0 +1,57 @@
+---
+name: Load Balanced Drupal
+description: Drupal instance with NGINX load balancing
+keywords: ''
+type: Drupal
+documentation: |
+  Drupal 7.28 with MySQL
+  =========
+
+  ##Instructions
+  Adjust the values of the environmental variables on the MySQL service to match your needs. When configuring Drupal via the UI, use these values.
+
+  For Database Address, use the MySQL service ALIAS value from your link entry on the Drupal service. This value is mapped to the IP of the MySQL container. No port is needed. Be sure to select **MySQL** as your database type when filling in the Drupal setup.
+
+  ##Port Forwarding
+  To view the GUI after launching the template, map your local host machine to port _8080_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8997,,8080`
+
+  Where, rule1 is the friendly name of the rule, tcp is the protocol. Replace port _8997_ with the local free port of your choice.
+
+  After you run this command locally, browse to **http://localhost:8997** to see the GUI, as per the example.
+images:
+- name: MySQL
+  source: centurylink/mysql:5.5
+  category: DB Tier
+  type: Default
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word
+  - variable: MYSQL_DATABASE
+    value: drupal
+  - variable: MYSQL_USER
+    value: user
+  - variable: MYSQL_PASSWORD
+    value: pass@word01
+- name: Drupal_7.28
+  source: centurylink/drupal:7.28
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+  links:
+  - service: MySQL
+    alias: MYSQLDB
+- name: nginx_1
+  source: nginx:latest
+  category: Load Balancer
+  type: Default
+  ports:
+  - host_port: '7777'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: Drupal_7.28
+    alias: Drupal_7.28
