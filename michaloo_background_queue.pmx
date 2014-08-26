@@ -1,0 +1,62 @@
+---
+name: Background platform using Beanstalk
+description: "Beanstalk is a simple, fast work queue.\r\n\r\nIts interface is generic, but was originally designed for reducing the latency of page views in high-volume web applications by running time-consuming tasks asynchronously."
+keywords: worker, queue
+type: NodeJS
+documentation: |-
+  # Beanstalk
+
+  Beanstalk is a simple, fast work queue.
+
+  ## System Requirements
+
+  - *RAM:* 256 MB
+  - *Cores:* 1 core
+
+  ## Post-Run Instructions
+
+  After setting up the project there is a Beanstalk queue system with Beanstalk PHP Admin Console and some dummy worker
+
+  ## Port-Forwarding
+
+  Use the following commands in your local machine's terminal window to create the port forwarding rules:
+  `VboxManage controlvm panamax-vm natpf1 beanstalk_console,tcp,,8997,,8080`
+  `VboxManage controlvm panamax-vm natpf1 beanstalkd,tcp,,11300,,11300`
+
+  After you run this command locally, browse to **http://localhost:8997** to see the GUI.
+
+  You can setup beanstalk_console pointing to **localhost:11300**.
+
+  ## Resources
+
+  - [Official Beanstalk Website](http://kr.github.io/beanstalkd/)
+images:
+- name: Beanstalk
+  source: michaloo/beanstalkd:latest
+  category: Queue
+  type: Default
+  ports:
+  - host_port: 11300
+    container_port: 11300
+  volumes:
+  - host_path: "/data/beanstalkd"
+    container_path: "/var/run/beanstalkd"
+- name: Beanstalk console
+  source: michaloo/beanstalk_console:latest
+  description: Admin console for Beanstalk queue server, written in PHP
+  links:
+  - service: BEANSTALKD
+    alias: BEANSTALKD
+  ports:
+  - host_port: 8080
+    container_port: 80
+  category: Web
+  type: Default
+- name: Dummy Worker
+  source: michaloo/dummy_queue:latest
+  description: Dummy worker
+  links:
+  - service: BEANSTALKD
+    alias: BEANSTALKD
+  category: Web
+  type: Default
