@@ -1,19 +1,10 @@
 ---
 name: panamage
-description: this panamax template helps you setup a magento installation.
+description: this panamax template helps you setup a containerized infrastructure for running the magento e-commerce platform.
 keywords: magento, nginx, varnish, redis, php, mysql
 type: Magento
-documentation: |-
-  ##Application Name:
-
-  ##System Requirements:
-
-  ##Setup:
-
-  ##Post-Run Instructions:
-
-  ##Resources:
-
+documentation: |+
+*work-in-progress*
 images:
 - name: lb_nginx
   source: nginx:latest
@@ -73,7 +64,7 @@ images:
     container_path: '/usr/local/nginx/html'
   - host_path: '/var/panamax/confdata/web_nginx'
     container_path: "/etc/nginx"
-- name: app_php-fpm
+- name: app_phpfpm
   source: jprjr/ubuntu-php-fpm:latest
   category: APP
   type: Default
@@ -88,6 +79,8 @@ images:
     alias: web_nginx
   - service: db_mysql
     alias: db_mysql
+  - service: db_redis
+    alias: db_redis
   volumes:
   - host_path: '/var/panamax/confdata/app_phpfpm'
     container_path: '/etc/php5'
