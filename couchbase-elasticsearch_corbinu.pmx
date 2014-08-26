@@ -63,7 +63,7 @@ images:
   - service: couchbase1
     alias: couchbase
 - name: elasticsearch1
-  source: corbinu/docker-phpmyadmin:4.2.7.1
+  source: corbinu/docker-elasticsearch:1.0.1
   category: Search
   expose:
   - '9091'
@@ -73,7 +73,7 @@ images:
     container_port: '9200'
     proto: TCP
 - name: elasticsearch2
-  source: corbinu/docker-phpmyadmin:4.2.7.1
+  source: corbinu/docker-elasticsearch:1.0.1
   category: Search
   type: Default
   ports:
