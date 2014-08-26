@@ -1,0 +1,37 @@
+---
+name: folding-at-home_jordan0day
+description: Folding@Home Client, with customizable username, team, and power environment
+  variables.
+keywords: folding protein
+type: Default
+documentation: |+
+  Folding@Home
+  ==========
+
+  Run the folding@home client in docker. Customize your client's configuration by setting the USERNAME, TEAM, and POWER environment variables.
+
+  ## Requirements
+  System requirements vary, depending on whether you set the POWER environment variable to light, medium, or heavy.
+
+  ## Application Setup
+  By default, this template will run the folding@home client as an anonymous user. If you're like your compute units to count towards a particular user and/or team, you can specify a USERNAME and TEAM environment variable.
+
+  Additionally, you can flex the POWER environment variable, controlling whether the folding client should run in the power levels of light, medium (default), or heavy.
+
+  ## Port Forwarding
+  No port forwarding is necessary.
+
+  ## Verification
+  Your Panamax application log should show that FAHclient has started and is processing data.
+
+images:
+- name: jordan0day_folding-at-home_latest
+  source: jordan0day/folding-at-home:latest
+  type: Default
+  environment:
+  - variable: USERNAME
+    value: Anonymous
+  - variable: TEAM
+    value: '0'
+  - variable: POWER
+    value: '0'
