@@ -1,0 +1,58 @@
+---
+name: On-Demand Ubuntu Desktop
+description: Will install Ubuntu 14.04 with x2go and xubuntu. This allows you to run
+  a on-demand desktop in the cloud!
+keywords: ubuntu, desktop, ondemand, cloud, xubuntu
+type: Ubuntu
+documentation: |
+  On Demand Cloud Ubuntu Desktop
+  =============
+
+  Author: Stephen "TheCodeAssassin" Hoogendijk
+  Status: Works, but needs improvement (work in progress)
+
+  System requirements
+  -----------
+  Generic processor (Intel/AMD) 1.2ghz or more
+  At least 1gb of ram (2gb recommended)
+  4GB Diskspace (more recommended)
+
+  How to run
+  -----------
+  Set the environmental variable `ROOT_PASS` to set the containers root password, will work on setting the environmental variable for dockerx user as well.
+
+  If you run the container using the template, you can see the username and password in the CoreOS journal, should you wish to run the container manually simply run the following command:
+
+  `CID=$(docker run -p 2222:22 -t -d thecodeassassin/x2go-desktop --name x2go) && docker logs $CID`
+
+  This will output the following in the logs:
+
+  `========================================================================
+  You can now connect to this Ubuntu container via SSH using:
+
+      ssh -p <port> root@<host>
+  and enter the root password 'somepass' when prompted
+
+   dockerx password : anotherpass
+  use this to connect to the x2go server from your x2go client!
+  Please remember to change the above password as soon as possible!
+  ========================================================================
+  `
+
+  By default, the port
+
+  You can then download [X2Go](http://wiki.x2go.org/doku.php) and add the host IP:2222 and login with the user dockerx. The password can be found in the dockerx journal or in the docker logs.
+
+  Todo
+  ------
+  - Mount the users (/home/dockerx) folder as a volume so the users home data will persist. (optional)
+  - More choices in desktop flavors
+  - setting the users password with env variables.
+images:
+- name: paimpozhil_dockerx2go_latest
+  source: paimpozhil/dockerx2go:latest
+  category: Xubuntu
+  type: Default
+  environment:
+  - variable: ROOT_PASS
+    value: testtest
