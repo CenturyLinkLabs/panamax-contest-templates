@@ -1,0 +1,62 @@
+---
+name: OpenProject
+description: OpenProject project management system with PostgreSQL and Memcached
+keywords: openproject, postgresql, postgres, memcached, all
+type: Default
+documentation: |-
+  # OpenProject with PostgreSQL and Memcached
+
+  OpenProject is a web based project management system built on Ruby on Rails. OpenProject is free and open source with a wide set of features and plugins and an active community.
+
+  ## System Requirements
+
+  - *RAM:* 1 GB
+  - *Cores:* 1 core
+
+  ## Setup
+
+  Allow a few minutes for the database setup to complete. Watch the journal output for the message:
+
+  `Booting application...`
+
+  After setup, browse to **http://localhost:8080** to see the dashboard screen.
+
+  Login using the default username and password:
+
+  username: **admin**
+
+  password: **admin**
+
+  ## Resources
+
+  * [Official OpenProject website](https://www.openproject.org)
+images:
+- name: OpenProject
+  source: abevoelker/openproject:latest
+  category: Web
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: Postgres
+    alias: postgres
+  - service: Memcached
+    alias: memcached
+- name: Postgres
+  source: paintedfox/postgresql:latest
+  category: DB
+  type: Default
+  environment:
+  - variable: USER
+    value: 'super'
+  - variable: PASS
+    value: 'password'
+- name: Memcached
+  source: tutum/memcached:latest
+  category: DB
+  type: Default
+  environment:
+  - variable: MEMCACHED_PASS
+    value: 'password'
