@@ -27,14 +27,25 @@ images:
   source: crosbymichael/youtubedl:latest
   category: Video Acquirer
   type: Default
+  volumes:
+  - host_path: ''
+    container_path: deis_data
 - name: attensee_harp
   source: attensee/harp:latest
   category: GIF Displayer
   type: Default
+  expose:
+  - '9000'
+  volumes:
+  - host_path: ''
+    container_path: deis_data
 - name: dergachev_screengif
   source: dergachev/screengif:latest
   category: GIF Generator
   type: Default
+  volumes:
+  - host_path: ''
+    container_path: deis_data
 - name: deis_data
   source: deis/data:latest
   category: GIF Storage
