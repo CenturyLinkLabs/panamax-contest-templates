@@ -1,11 +1,11 @@
 ---
 name: Appistack
-description: Ng-Rails with Lineman, PostgreSQL and Redis
-keywords: rails, postgresql, all
+description: Opinionated Ng-Rails with Lineman, PostgreSQL and Redis
+keywords: angular, ng, ruby, rails, lineman, postgresql, redis, all
 recommended:
 type: Rails
 documentation: |
-  Rails with PostgreSQL
+  Appistack: Opinionated Angular-Rails
   =========
 
   ##Port Forwarding
@@ -17,8 +17,8 @@ documentation: |
 
   After you run this command locally, browse to **http://localhost:8997** to see the GUI, as per the example.
 images:
-- category: DB Tier
-  name: DB_1
+- name: DB_1
+  category: DB Tier
   source: dharmamike/pmx-pgsql:latest
   description: PostgreSQL
   type: Default
@@ -29,9 +29,13 @@ images:
   links: []
   environment: []
   volumes: []
-- category: Rails(API-only)
-  name: Rails
-  source: dharmamike/pmx-rails:latest
+- name: Redis_1
+  category: DB Tier
+  source: sameersbn/redis:latest
+  type: Default
+- name: Rails41_1
+  category: Rails41 API
+  source: dcunited001/appistack-rails41:latest
   description: Appistack Rails API
   type: Default
   expose: []
@@ -41,11 +45,25 @@ images:
   links:
   - service: DB_1
     alias: DB_1
+  - service: Redis_1
+    alias: Redis_1
   environment: []
   volumes: []
-- category: Lineman(API-only)
-  name: Lineman
-  source: dcunited001/lineman
-  description: Runs lineman build and serves static files
-
+# - name: Work41_1
+#   category: Rails41 Workers
+#   source: dcunited001/appistack-rails41
+#   description: Appistack Rails Workers
+#   type: Default
+#   expose: []
+#   ports:
+#   - host_port: '8080'
+#     container_port: '3000'
+#   links:
+#   - service: DB_1
+#     alias: DB_1
+#   - service: Redis_1
+#     alias: Redis_1
+#   environment: []
+#   volumes: []
+#   command: 'QUEUES=* bundle exec rake resque:work'
 
