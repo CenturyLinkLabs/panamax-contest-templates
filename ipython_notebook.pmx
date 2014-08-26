@@ -8,7 +8,7 @@ documentation: |-
 
  It has been set to use port 9999
 
- It uses a self-signed certificate and sets the default password to panamax.
+ It uses a self-signed certificate and sets the default password to `panamax`.
 
  You can set PASSWORD environment variable in the applications management screen.
 
