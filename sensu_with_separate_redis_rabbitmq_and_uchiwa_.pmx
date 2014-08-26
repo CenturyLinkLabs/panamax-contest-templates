@@ -1,0 +1,82 @@
+---
+name: 'Sensu with separate Redis, RabbitMQ and Uchiwa '
+description: "Sensu with separate Redis, RabbitMQ and Uchiwa\r\n\r\nSensu is a great
+  monitoring tool, and requires a few services to run. To be able to scale properly,
+  I've added a separate Redis and RabbitMQ instance, as well as keep the web GUI called
+  Uchiwa as a separate container to be able to swap it out if needed."
+keywords: sensu, redis, rabbitmq, uchiwa, monitoring
+type: Default
+documentation: |-
+  ## Application Name:
+
+  Sensu with separate Redis, RabbitMQ and Uchiwa
+
+  Sensu is a great monitoring tool, and requires a few services to run. To be able to scale properly, I've added a separate Redis and RabbitMQ instance, as well as keep the web GUI called Uchiwa as a separate container to be able to swap it out if needed.
+
+  ## System Requirements:
+
+  Recommended: 2 cores, 2GB memory
+
+  ## Application Setup:
+
+  There are a few already set up environment variables that default to hostnames and ports used here.
+  They are:
+
+  API1_PORT_4567_TCP_PORT: Port that Uchiwa will try to reach Sensu on, default set value is 4567
+  API1_PORT_4567_TCP_ADDR: Host that Uchiwa will try to reach Sensu on, default set value is sensu
+
+  Port that needs to be opened are:
+  6379: Redis
+  3000: Uchiwa
+  4567: Sensu API
+  5672 and 15672: RabbitMQ
+  
+  ##Post-Run Instructions:
+
+  Just run "VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8997,,8080" after starting this app, point your browser to http://localhost:8997 and you'll be able to to see the Uchiwa GUI, connected to the Sensu API, storing information in Redis and RabbitMQ.
+
+  RabbitMQ has been set to using default username and password sensu/sensu on vhost / .
+
+images:
+- name: redis_latest
+  source: redis:latest
+  category: DB
+  type: Default
+  expose:
+  - '6379'
+- name: uchiwa_uchiwa
+  source: uchiwa/uchiwa:latest
+  category: GUI
+  type: Default
+  expose:
+  - '3000'
+  ports:
+  - host_port: '8080'
+    container_port: '3000'
+    proto: TCP
+  links:
+  - service: virtualswede_docker-sensu
+    alias: sensu
+  environment:
+  - variable: API1_PORT_4567_TCP_PORT
+    value: '4567'
+  - variable: API1_PORT_4567_TCP_ADDR
+    value: sensu
+- name: virtualswede_docker-sensu
+  source: virtualswede/docker-sensu:latest
+  category: Sensu
+  type: Default
+  expose:
+  - '4567'
+  links:
+  - service: redis_latest
+    alias: redis
+  - service: virtualswede_tutum-docker-rabbitmq
+    alias: rabbitmq
+- name: virtualswede_tutum-docker-rabbitmq
+  source: virtualswede/tutum-docker-rabbitmq:latest
+  category: Message Queue
+  type: Default
+  expose:
+  - '5672'
+  - '15672'
