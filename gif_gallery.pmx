@@ -1,0 +1,41 @@
+---
+name: Gif Gallery
+description: Allows you to you put in a keyword, and run a command that will grab
+  youtube videos based on your keyword, download them, convert them to GIFs, and then
+  display them in a nice gallery.
+keywords: gif, gallery, nodejs, harpjs, animated gif, funny
+type: NodeJS
+documentation: |+
+  * **GIF Gallery:** Describe your application and its services (if any) here.
+
+  * **System Requirements:** Define minimum system requirements to successfully run the application.
+    For Example:
+    Recommended 2 Cores, 1GB of RAM
+
+  * **Setup:** Provide instructions on how to setup the application.
+
+  * **Post-Run Instructions:** Provide users of this template with any steps needed to complete the configuration of the application.
+
+  * **Port-Forwarding:** To enable access to this application outside of your Docker Host, please provide instructions.
+    For Example:
+    If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+    `VBoxManage controlvm panamax-vm natpf1 rule,tcp,,9000,,9000`
+    or use a [link to our wiki page instructions.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+images:
+- name: crosbymichael_youtubedl
+  source: crosbymichael/youtubedl:latest
+  category: Video Acquirer
+  type: Default
+- name: attensee_harp
+  source: attensee/harp:latest
+  category: GIF Displayer
+  type: Default
+- name: dergachev_screengif
+  source: dergachev/screengif:latest
+  category: GIF Generator
+  type: Default
+- name: deis_data
+  source: deis/data:latest
+  category: GIF Storage
+  type: Default
