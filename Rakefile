@@ -8,5 +8,5 @@ task :default do
   diff = `git diff --stat=400,380 --diff-filter=ACMRTUXB source/master`
   modified_templates = diff.scan(/[\w-]+.pmx/)
 
-  PanamaxTemplateValidator.validate_file_list(modified_templates)
+  PanamaxTemplateValidator.validate_repo
 end
