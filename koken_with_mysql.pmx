@@ -1,0 +1,46 @@
+name: Koken with MySQL
+description: Koken, the web publishing platform for photographers
+keywords: cms, publishing, web, koken, photograpy, images, gallery
+documentation: |
+  Koken with MySQL
+  ============================
+  Koken is a free system designed for publishing independent web sites of creative work.
+
+  http://koken.me
+  
+  It offers a great way of storing and publishing pictures. It can not only be used to host a public picture blog, but also to store and annotize your private image collection, as a better and private Everpix.
+
+  Installation is simple. This Koken installation will bind itself to the local domain koken.example.com. You should modify this to your needs in order to set up the correct domain. For local installations, .local domains are, of course, more useful.
+authors:
+- 'akash.k.garg@gmail.com'
+type: LAMP
+images:
+- name: DB
+  source: centurylink/mysql:5.5
+  description: MySQL
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: 897sad89f987
+  ports:
+  - host_port: 3306
+    container_port: 3306
+  category: DB Tier
+  type: mysql
+- name: Web
+  source: maxexcloo/koken:latest
+  description: Koken Application
+  environment:
+  - variable: DB_PASSWORD
+    value: 897sad89f987
+  - variable: DB_NAME
+    value: koken
+  - variable: VIRTUAL_HOST
+    value: koken.example.com
+  links:
+  - service: DB
+    alias: DB_1
+  ports:
+  - host_port: 8080
+    container_port: 80
+  category: Web Tier
+  type: Default
