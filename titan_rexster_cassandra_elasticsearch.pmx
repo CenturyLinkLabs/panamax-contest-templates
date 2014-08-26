@@ -1,0 +1,69 @@
+---
+name: titan-rexster-cassandra-elasticsearch
+description: "Titan is a free, open source database that is capable of processing
+  extremely large graphs and it supports a variety of indexing and storage backends,
+  which makes it easier to extend than some popular NoSQL Graph databases.\r\n\r\nThis
+  docker image instantiates a Titan graph database that is capable of integrating
+  with an ElasticSearch container (Indexing) and a Cassandra container (Storage)."
+keywords: titan,rexster,cassandra,elasticsearch,tinkerpop,gremlin
+type: Default
+documentation: "# Docker Image for Titan Graph Database\n\nTitan is a free, open source
+  database that is capable of processing\nextremely large graphs and it supports a
+  variety of indexing and storage backends,\nwhich makes it easier to extend than
+  some popular NoSQL Graph databases.\n\nThis docker image instantiates a Titan graph
+  database that is capable of\nintegrating with an ElasticSearch container (Indexing)
+  and a Cassandra container (Storage).\n\nThe default distribution of Titan runs on
+  a single node, so I thought it would be helpful\nif there was a modular way at runtime
+  to hook up Titan to its dependencies.\n\n## Titan\n\nThis container is using Titan
+  0.5.0. Please refer to\nits [page](https://github.com/thinkaurelius/titan/wiki/Downloads)
+  for more information.\n\n## Tinkerpop and Rexster\n\n[Tinkerpop](http://www.tinkerpop.com/)
+  is a vendor-independent API specification for\nmanipulating and access Graph databases.\n\n[Rexster](https://github.com/tinkerpop/rexster/wiki)
+  is a service that provides protocols\nfor accessing a graph database. Currently
+  it supports two protocols:\n\t- REST over HTTP: Human-readable and good for testing\n\t-
+  RexPro: Binary Protocol for performance\n\nIf you'd like to avoid vendor lock-in,
+  then I'd recommend using Rexster as the API\nfor accessing your Graph database.
+  It has support for popular graph databases,\nso you can avoid refactoring your code.
+  Take a look at Tinkerpop Gremlin for a\nGroovy-DSL for querying graphs to see how
+  RexPro and Gremlin provide syntactical\nelegance to query graphs.\n\n## System Requirements\n\nThe
+  minimum system requirements for this stack is 1 GB with 2 cores.\n\n### Port Forwarding\n\n8182:
+  HTTP port for REST API\n\n8183: RexPro for native access (Binary protocol)\n\n8184:
+  JMX Port (You won't need to use this, probably)\n\nYou can read more about it in
+  the Rexster documentation.\n\nTo test out the REST API:\n\n```\ncurl http://localhost:<port-mapped-to-8182>/graphs/graph/vertices\n```\n\nPlease
+  refer to the [instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+  on how to do port forwarding on VirtualBox.\n\n## Roadmap\n\nIn the near future,
+  I'd like to add support for:\n\n\t- Scaling/Clustering Cassandra and ElasticSearch
+  backends.\n\t- External volumes for persistent data.\n\t- Security between Titan
+  and its backends.\n\t- Example application stack integrating with Titan."
+images:
+- name: dockerfile_elasticsearch_latest
+  source: dockerfile/elasticsearch:latest
+  category: Storage/Indexing
+  type: Default
+  expose:
+  - '9200'
+  - '9300'
+- name: poklet_cassandra
+  source: poklet/cassandra:latest
+  category: Storage/Indexing
+  type: Default
+  expose:
+  - '22'
+  - '61621'
+  - '7000'
+  - '7199'
+  - '8012'
+  - '9042'
+  - '9160'
+- name: apobbati_titan-rexster
+  source: apobbati/titan-rexster:latest
+  category: Database
+  type: Default
+  expose:
+  - '8182'
+  - '8183'
+  - '8184'
+  links:
+  - service: dockerfile_elasticsearch_latest
+    alias: elasticsearch
+  - service: poklet_cassandra
+    alias: cassandra

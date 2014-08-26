@@ -1,0 +1,40 @@
+---
+name: Jenkins 1.574
+description: Jenkins 1.574 running through port 80 of your CoreOS host
+keywords: jenkins
+type: Default
+documentation: |
+  # Jenkins
+
+  A simple template to run Jenkins through port 80 of your CoreOS host.
+
+  ## System Requirements
+
+  Recommended: 2 Cores, 4 GB of RAM
+
+  ## Pre-Run Instructions
+
+  None. Fire away.
+
+  ## Post-Run Instructions
+
+  Access Jenkins at the IP address of your CoreOS host.
+
+  Once you are able to see the Jenkins dashboard, immediately run through the Jenkins [Standard Security Setup](https://wiki.jenkins-ci.org/display/JENKINS/Standard+Security+Setup).
+
+  ## Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 jenkins-8080,tcp,,8080,,80`
+
+  Then go to http://localhost:8080 to see the Jenkins dashboard.
+images:
+- name: jenkins_1.574
+  source: jenkins:1.574
+  category: CI
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '8080'
+    proto: TCP

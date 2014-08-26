@@ -1,0 +1,73 @@
+---
+name: Couchbase 5 node cluster
+description: Panamax template for couchbase 5 node cluster.
+keywords: ''
+type: Default
+documentation: |
+  Panamax template for couchbase 5 node cluster.
+  Most of the steps taken from: http://blog.abhinav.ca/blog/2014/07/31/kickstart-a-couchbase-cluster-with-docker
+
+  Step 1 : Login into coreOS
+  panamax ssh
+
+  Step 2: Run the blow command from coreOS
+  docker ps
+
+  for name in dustin_couchbase_{1..4}; do docker inspect -f '{{ .NetworkSettings.IPAddress }}' $name; done
+
+  It will give you 4 IP address:
+  172.17.36.140
+  172.17.36.139
+  172.17.36.142
+  172.17.36.141
+
+  Step 3: Open new termial and run all these commands in host OS (where your Virtual box running)
+
+
+  VboxManage controlvm panamax-vm natpf1 rule1,tcp,,8091,,8091
+  VboxManage controlvm panamax-vm natpf1 rule2,tcp,,8092,,8092
+  VboxManage controlvm panamax-vm natpf1 rule3,tcp,,11210,,11210
+
+  Step 4: Go to
+  http://localhost:8091/
+
+  Login with
+  Username: Administrator
+  Password: password
+
+  Step 5: Go to "Server Nodes"
+  Add servers by IP address (Ref# Step: 2)
+images:
+- name: dustin_couchbase_latest_server_node
+  source: dustin/couchbase:latest
+  category: CouchBase cluster
+  type: Default
+  ports:
+  - host_port: '11210'
+    container_port: '11210'
+    proto: TCP
+  - host_port: '11211'
+    container_port: '11211'
+    proto: TCP
+  - host_port: '8091'
+    container_port: '8091'
+    proto: TCP
+  - host_port: '8092'
+    container_port: '8092'
+    proto: TCP
+- name: dustin_couchbase_1
+  source: dustin/couchbase:latest
+  category: CouchBase cluster
+  type: Default
+- name: dustin_couchbase_2
+  source: dustin/couchbase:latest
+  category: CouchBase cluster
+  type: Default
+- name: dustin_couchbase_3
+  source: dustin/couchbase:latest
+  category: CouchBase cluster
+  type: Default
+- name: dustin_couchbase_4
+  source: dustin/couchbase:latest
+  category: CouchBase cluster
+  type: Default

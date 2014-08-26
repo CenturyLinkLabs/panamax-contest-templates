@@ -1,0 +1,63 @@
+---
+name: Logstash + Kibana with sample Rails app
+description: An out-of-the-box Logstash installation with Kibana to visualize data,
+  including a sample Rails app to generate data. Makes use of Docker container linking
+  so the containers can communicate without requiring exposed ports.
+keywords: logstash, kibana, rails
+type: Default
+documentation: |-
+  Logstash + Kibana with sample Rails app
+  =======================================
+  This template includes a [Logstash](http://logstash.net/) server with [Kibana](http://www.elasticsearch.org/overview/kibana/) to visualize the data.
+
+  The Rails application is forked from Michael Hartl's [sample app](https://github.com/railstutorial/sample_app_2nd_ed) from his Ruby on Rails tutorial. I added the [logstash-logger](https://github.com/dwbutler/logstash-logger) gem to demonstrate how easy it is to store events in Logstash.
+
+  I modified Alen Komljen's [Dockerfile](https://github.com/komljen/dockerfile-examples/tree/master/rails-sample-app) for this sample app to use my fork and to expose a different port (since the Panamax UI service runs on port 3000).
+
+  This template makes use of Docker links so the containers can communicate with each other without requiring exposed ports. The alias for the link between Logstash and Rails needs to be _LOGSTASH_. If this is changed, the template will not work.
+
+  After launching the template, you'll need to map three ports on your local machine: 3333 for Rails, 9200 for Logstash, and 9292 for Kibana.
+
+  If using Virtual Box, use the following commands in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 kibana,tcp,,9292,,9292`
+
+  `VBoxManage controlvm panamax-vm natpf1 logstash,tcp,,9200,,9200`
+
+  `VBoxManage controlvm panamax-vm natpf1 rails,tcp,,3333,,3333`
+
+  After you run these commands locally, browse to **http://localhost:9292/index.html#/dashboard/file/logstash.json** to see the default Kibana dashboard.
+
+  To populate Logstash with events, poke around the sample Rails application at **http://localhost:3333**.
+
+  Have fun!
+
+  NOTE: This template can use significant resources. It was developed on a Panamax VM with 4GB of RAM.
+images:
+- name: pblittle_docker-logstash_latest
+  source: pblittle/docker-logstash:latest
+  category: Logstash
+  type: Default
+  expose:
+  - '5228'
+  ports:
+  - host_port: '9292'
+    container_port: '9292'
+    proto: TCP
+  - host_port: '9200'
+    container_port: '9200'
+    proto: TCP
+  environment:
+  - variable: LOGSTASH_CONFIG_URL
+    value: https://gist.githubusercontent.com/carmstrong/13040ba5b96ee8367728/raw/338dca284990d9e41ba6923228844ab53a966ac4/logstash.conf
+- name: carmstrong_rails-sample-logstash
+  source: carmstrong/rails-sample-logstash:latest
+  category: Rails
+  type: Default
+  ports:
+  - host_port: '3333'
+    container_port: '3333'
+    proto: TCP
+  links:
+  - service: pblittle_docker-logstash_latest
+    alias: LOGSTASH

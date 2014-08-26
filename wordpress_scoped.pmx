@@ -1,0 +1,82 @@
+---
+name: wordpress (WP)
+description: demo app for scope template
+keywords: wordpress, scope
+type: Wordpress
+documentation: |-
+  Wordpress with MySQL
+  ============================
+  The alias for the link between Wordpress and MySQL needs to be _DB_1_. If this is changed, the template will not work.
+
+  Also, the password can be changed, but the environmental variables need to be changed on both services.
+
+  To view the GUI after launching the template, map your local host machine to port _8080_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 wordpress,tcp,,8997,,8080`
+
+  Where, wordpress is the friendly name of the rule, tcp is the protocol. Replace port _8997_ with the local free port of your choice. If you change the port bindings on the Wordpress service, _8080_ will need to be changed to match that too.
+
+  After you run this command locally, browse to **http://localhost:8997** to see the GUI, as per the example.
+
+  scoped
+  ======
+  this template, originally at https://github.com/CenturyLinkLabs/panamax-public-templates/blob/master/wordpress.pmx, has been modified as an example -- see https://github.com/fortheswarm/panamax-contest-templates/blob/master/scope.pmx 
+
+images:
+- name: DB
+  source: centurylink/mysql:5.5
+  category: DB Tier
+  type: mysql
+  ports:
+  - host_port: 3306
+    container_port: 3306
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word01
+- name: WP
+  source: centurylink/wordpress:3.9.1
+  category: Web Tier
+  type: wordpress
+  ports:
+  - host_port: 8080
+    container_port: 80
+  links:
+  - service: DB
+    alias: DB_1
+  environment:
+  - variable: DB_PASSWORD
+    value: pass@word01
+  - variable: DB_NAME
+    value: wordpress
+- name: sink
+  source: strcrzy/sink:latest
+  category: sink
+  type: Default
+  expose: ['8080']
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  volumes:
+  - host_path: ''
+    container_path: "/sink"
+- name: suricata
+  source: strcrzy/sensor:suricata
+  category: sensor
+  type: Default
+  links:
+  - service: WP
+    alias: WP
+  - service: sink
+    alias: sink
+  command: "--volumes-from=sink --net=container:WP --privileged"
+- name: bro
+  source: strcrzy/sensor:bro
+  category: sensor
+  type: Default
+  links:
+  - service: WP
+    alias: WP
+  - service: sink
+    alias: sink
+  command: "--volumes-from=sink --net=container:WP --privileged"

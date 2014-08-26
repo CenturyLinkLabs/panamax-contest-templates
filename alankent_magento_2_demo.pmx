@@ -1,0 +1,69 @@
+---
+name: Magento 2 Demo
+description: This Panamax template contains an alpha build of Magento 2. It is an
+  experiment to see how well Panamax can be used to allow people to grab a copy of
+  the next Magento release and get it up and running without having to worry about
+  constantly changine installation instructions.scription
+keywords: Magento2, alpha, demo
+type: Magento
+documentation: |-
+  ## Application Name:
+
+  Magento 2 0.1.0-alpha89 Demonstration
+
+  ## System Requirements:
+
+  Recommended: 2 cores, 4GB memory
+
+  ## Setup:
+
+  Set the PUBLIC_HOST to the host name to access the site. This is used when
+  forming URLs to additional pages.
+
+  Not that restarting the container will wipe the database and create it
+  again from scratch.
+
+  See also https://github.com/alankent/docker-magento2-demo-apache
+
+  ##Post-Run Instructions:
+
+  Access http://yourhost.com/ to access the store front (try a query of 'jacket').
+
+  Access http://yourhost.com/index.php/backend for the admin interface.
+  Username 'admin' and password 'admin123'.
+
+  ##Resources:
+
+  [Blog Post](http://alankent.wordpress.com/2014/08/24/magento-2-demo-on-docker-and-panamax/)
+
+  [Magento 2 Demo Docker Image](https://github.com/alankent/docker-magento2-demo-apache)
+
+  [Magento](http://www.magento.com/)
+images:
+- name: alankent_docker-magento2-demo-apache_latest
+  source: alankent/docker-magento2-demo-apache:latest
+  category: Application Tier
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: MYSQL_USER
+    value: root
+  - variable: MYSQL_PASSWORD
+    value: admin
+  - variable: PUBLIC_HOST
+    value: localhsot
+- name: mysql
+  source: mysql:latest
+  category: Database Tier
+  type: Default
+  expose:
+  - '3306'
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: admin

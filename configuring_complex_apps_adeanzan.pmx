@@ -1,0 +1,61 @@
+---
+name: "Configuring Complex Apps" 
+description: "An example of using a dedicated container to provide a wizard-style
+  interface to update configuration in multiple other containers.\r\n\r\nThis provides
+  an alternative to using environment variables for a complex application or one where
+  you want to guide the user through a complex setup process, such as when providing
+  evaluation versions of your application."
+keywords: configuration
+type: Default
+documentation: |-
+  Complex Configuration Example
+  =============================
+
+  This application provides an example of using a container within the application to guide a new user through initial setup and configuration. This may be useful when distributing complex software for users to evaluate.
+
+  ### System Requirements
+  This is a minimal demo application that consists of 3 containers.
+
+  ### Setup
+
+  After starting the application, you will need to forward port 9080.
+
+  For example: `VBoxManage controlvm panamax-vm natpf1 zancfgexample,tcp,,9080,,9080`
+
+  If you experience issues with containers not starting or you see an error like `Error response from daemon: No such container: zanco_pmx-config-proxy`, try restarting with `$ panamax restart`. If that doesn't resolve the problem, you can also try the "Rebuild App" button.
+
+  ### Post-run Instructions
+
+  To access the application go to: http://localhost:9080/
+
+  ### Port Forwarding
+  If you're using Virtual Box:
+  `VBoxManage controlvm panamax-vm natpf1 zancfgexample,tcp,,9080,,9080`
+
+  ### Resources
+  A blog post with additional details is available at: http://blog.zanconsulting.com/panamax-experiment-providing-a-configuration-wizard/
+images:
+- name: zanco_pmx-config-app_latest
+  source: zanco/pmx-config-app:latest
+  category: App
+  type: Default
+- name: zanco_pmx-config-proxy
+  source: zanco/pmx-config-proxy:latest
+  category: Proxy
+  type: Default
+  ports:
+  - host_port: '9080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: zanco_pmx-config-app_latest
+    alias: app
+- name: zanco_pmx-config-configurator
+  source: zanco/pmx-config-configurator:latest
+  category: Configuration
+  type: Default
+  links:
+  - service: zanco_pmx-config-app_latest
+    alias: app
+  - service: zanco_pmx-config-proxy
+    alias: proxy

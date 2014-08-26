@@ -1,0 +1,103 @@
+name:  ShareLatex
+description: ShareLatex + MongoDB + Redis in Panamax
+keywords: ShareLatex, MongoDB, Redis
+type: Default
+documentation: |-
+  
+  ## ShareLatex
+
+  [ShareLatex](http://www.ShareLatex.com) The easy to use, online, collaborative LaTex Editor
+
+  ## Redis 
+
+  [Redis](http://www.Redis.io) is an open source, BSD licensed, advanced key-value cache and store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets, sorted sets, bitmaps and hyperloglogs. 
+
+  ## MongoDB
+
+  [MongoDB](http://www.mongodb.com) is the leading NoSQL database, empowering businesses to be more agile and scalable. Fortune 500 companies and startups alike are using MongoDB to create new types of applications, improve customer experience, accelerate time to market and reduce costs. 
+
+  ### Miscellaneous
+  
+  * This template would not be possible without the amazing work done by the guys at ShareLatex at [ShareLatex](http://www.sharelatex.net)
+
+  ## Setup 
+
+  After succesfully deploying this template, you'll have to forward only the HTTP port (4000).
+
+  ### Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rules:
+  ```
+  $ VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,4000,,4000
+  ```
+
+  ### Launch
+
+  After all containers are deployed, simply point your browser to http://localhost:3000/
+
+  WARNING: There seems to be an issue now where if you try to access the site soon after all containers are deployed an exception will occur. To make sure this does not happen, please wait approximately 1 minute after all containers are deployed. 
+
+  ```
+
+  ## System Requirements  
+
+  * *Memory:* 1GB Recommended
+  * *CPU:* 2 core Recommended
+
+  For more documentation, please go to [http://sharelatex.com](http://sharelatex.com)
+  
+  ## Other
+
+  * borja/sharelatex is a HUGE image. Be patient. TODO: create new from code, compile and delete fluff.
+  * borja/sharelatex include Mongo and Redis (but they are not used). TODO: remove Redis and Mongo.
+  * Although this works for testing methods, I would still not recommend for production. 
+
+authors:
+- Jorge Mejía
+images:
+- category: Cache
+  name: REDIS
+  source: tutum/redis:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '6379'
+    container_port: '6379'
+  links: []
+  environment:
+  - variable: REDIS_PASS
+    value: password
+  volumes: []
+- category: NoSQL
+  name: MONGODB
+  source: dockerfile/mongodb:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '27017'
+    container_port: '27017'
+  - host_port: '28017'
+    container_port: '28017'
+  environment: []
+  volumes: []
+  command: '/usr/bin/mongod --smallfiles --nojournal'
+- category: Application
+  name: SHARELATEX
+  source: borja/sharelatex:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '4000'
+    container_port: '3000'
+  links:
+  - service: REDIS
+    alias: REDIS
+  - service: MONGODB
+    alias: MONGODB
+  environment:
+  - variable: SHARELATEX_CONFIG
+    value: sharelatex/config/settings.default.coffee
+  volumes: []

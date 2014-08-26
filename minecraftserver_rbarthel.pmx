@@ -1,0 +1,11 @@
+---
+name: minecraftserver_rbarthel
+description: A no configuration Minecraft server using Panamax.
+keywords: minecraft
+type: Java
+documentation: A no configuration Minecraft server using Panamax.<br>Best run with
+  2GB RAM.<br>Using port 25565.
+images:
+- name: zachlatta_minecraft_latest
+  source: zachlatta/minecraft:latest
+  type: Default

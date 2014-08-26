@@ -1,0 +1,77 @@
+---
+name: Private Chat Network
+description: An example of combining many off the shelf components and creating an
+  IRC network out of them, complete with webchat.
+keywords: ''
+type: Default
+documentation: |-
+  # Simple Private Panamax Chat Network
+
+  Please start this image on a fresh install of Panamax. I have been testing this using [my GCE scripts](https://github.com/Xe/dotfiles/tree/master/cloud/gce/panamax).
+
+  Please do not run this on a machine without at least 2 GB of ram.
+
+  This is a simple combination of several off the shelf services to create a proof-of-concept IRC network with full [Atheme](http://atheme.org) services as well as showing off [Tetra](http://github.com/Xe/Tetra) as a general purpose hosted chatter bot. The following services are included in this image:
+
+   - Atheme 7.1 (NickServ, ChanServ, etc)
+   - Elemental-IRCd 6.6
+   - Tetra 0.1-indev
+   - etcd 0.4.2
+   - Iris git head (webchat)
+
+  After this image starts up, head to http://your_panamax_server_ip:80 to access the webchat. Put this on a cloud server and you can have an effortlessly set up chat server for evaluating the products used, or even for things like covert operations and/or bot testing. Atheme's XMLRPC is exposed on port `8080`. At this time Tetra's built in api is not exposed, nor is its private instance of etcd. Any standard IRC client may be used to connect to this daemon over exposed port `6667`
+
+  If running in virtualbox, please expose the following ports for testing:
+
+   - `6667` - main IRCd port
+   - `80` - webchat port
+
+  To `OPER` up, use `/oper god swag`. The SRA account in Atheme is set to `god` so be sure to register that nickname as soon as possible.
+
+  For more information on the projects this image uses, here are some links:
+
+   - Atheme Services: http://atheme.org
+   - Elemental-IRCd: http://github.com/elemental-ircd/elemental-ircd
+   - Tetra: http://github.com/Xe/Tetra
+images:
+- name: xena_pmx-atheme
+  source: xena/pmx-atheme:latest
+  category: Services
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+- name: xena_tetra
+  source: xena/tetra:latest
+  category: Services
+  type: Default
+  links:
+  - service: xena_pmx-ircd
+    alias: ircd
+  - service: xena_etcd-minimal
+    alias: etcd
+- name: xena_pmx-webchat
+  source: xena/pmx-webchat:latest
+  category: webchat
+  type: Default
+  ports:
+  - host_port: '80'
+    container_port: '3989'
+    proto: TCP
+- name: xena_pmx-ircd
+  source: xena/pmx-ircd:latest
+  category: ircd
+  type: Default
+  expose:
+  - '6667'
+  ports:
+  - host_port: '6667'
+    container_port: '6667'
+    proto: TCP
+- name: xena_etcd-minimal
+  source: xena/etcd-minimal:latest
+  category: store
+  type: Default

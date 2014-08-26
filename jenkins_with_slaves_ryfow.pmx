@@ -1,0 +1,99 @@
+---
+name: Jenkins_ryfow
+description: Jenkins Continuous Integration Server
+keywords: jenkins
+type: Java
+documentation: |-
+  Jenkins Continuous Integration Server
+  =====================================
+
+  The Jenkins Continuous Integration (CI) Server is a great use of the
+  Docker and Panamax systems because it involves distributed application execution
+  and coordination. There is one Jenkins Master server, and many Jenkins Slaves that
+  are linked to the master for discovery and and workload negotiation.
+
+  Details about Jenkins CI can be found at [jenkins-ci.org](http://jenkins-ci.org/)
+
+  Installation Details
+  --------------------
+
+  There are a couple things to be aware of.
+
+  1. The Jenkins Master server listens to port 9080 on the Panamax
+     Host machine. You'll need to map that port to be able to access
+     the Jenkins web application. Once the application is running and
+     the port is mapped, Jenkins will be available via web browser at
+     `http://<localhost or Panamax IP>:9080/`
+  1. The slaves will fail to boot up if it takes too long for docker to
+     pull and start the `ryfow/jenkins` image. I like to run
+     `docker pull ryfow/jenkins:0.2` on my Panamax instance before trying
+     to run the Panamax application. Rebuilding the app after
+     jenkins_master comes up also works.
+
+  Adding Additional Slaves
+  ------------------------
+
+  This template defaults to creating a Jenkins Master and two Jenkins Slaves. Adding
+  additional slaves involves a few steps.
+
+  1. In Panamax, click the "Add a Service" button in the "Jenkins with Slaves" Application
+  1. In the "Search Images" dialog, search for "ryfow/docker-jenkins-slave"
+  1. Click the "Add to App" link in the images results
+  1. Click on the newly formed Service in the "Application Services" section of the Application
+  1. Add a "Service Link," mapping "jenkins_master" to "jenkins"
+  1. Add an Environment Variable mapping "SLAVE_NAME" to your new Jenkins Slave's name.
+  1. Add the Slave in Jenkins via the "Manage Jenkins" > "Manage Nodes" interface, making
+     sure that the Slave Name matches the Panamax SLAVE_NAME environment variable.
+
+  Volumes and Configuration
+  -------------------------
+
+  A volume mapping the host's /var/jenkins to the container's /var/lib/jenkins_home.
+  This allows end user customization. The `ryfow/jenkins` image loads some defaults
+  into `jenkins_home` if the `jenkins_home/config.xml` file doesn't yet exist.
+
+  Verifying Successful Launch
+  ---------------------------
+
+  If everything is running correctly, `http://<localhost or Panamax IP>:9080` will bring up the Jenkins
+  web interface and there will be four idle executors listed in the "Build Executor Status"
+  section. Two "master" executors, one "slave1" executor, and one "slave2" executor.
+
+  There's also a default Jenkins Job loaded that simply checks out Jenkins from Github and
+  builds `jenkins.war`.
+
+  System Requirements
+  -------------------
+
+  2 cores and 2GB of RAM
+
+
+images:
+- name: jenkins_master
+  source: ryfow/jenkins:0.2
+  type: Default
+  ports:
+  - host_port: '9080'
+    container_port: '8080'
+    proto: TCP
+  volumes:
+  - host_path: "/var/jenkins"
+    container_path: "/var/jenkins_home"
+- name: jenkins_slave_1
+  source: ryfow/docker-jenkins-slave:0.2
+  type: Default
+  links:
+  - service: jenkins_master
+    alias: jenkins
+  environment:
+  - variable: SLAVE_NAME
+    value: slave1
+- name: jenkins_slave_2
+  source: ryfow/docker-jenkins-slave:0.2
+  type: Default
+  links:
+  - service: jenkins_master
+    alias: jenkins
+  environment:
+  - variable: SLAVE_NAME
+    value: slave2

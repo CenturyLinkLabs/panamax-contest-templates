@@ -1,0 +1,65 @@
+---
+name: wagtailcms_with_postgres
+description: WagtailCMS demo with PostgreSQL and live editing
+keywords: wagtail, wagtailcms, django, postgres, postgresql
+type: Django
+documentation: |-
+  WagtailCMS demo with PostgreSQL and live editing
+  =========
+
+  ## Requirements
+
+  512MB RAM recommended.
+
+  ## Setup
+
+  This image links a Django (nginx+uwsgi) web server running the WagtailCMS demo to a linked Postgres DB, and automatically configures the Postgres DB for use.  It's an example of using the `django_postgres_live` template.  If you want to live-edit your app, you can mount `/home/core/django` on the panamax host (which is /opt/django/app inside the container) to your local machine. For example, in the `Vagrantfile` in `/home/.vagrant.d/boxes`, just after the `config.vm.synced_folder` line:
+
+  ```
+    config.vm.network "private_network", ip: "192.168.50.4"
+    config.vm.synced_folder "/run/django", "/home/core/django",
+    id: "django", :nfs => true, :mount_options => ['nolock,vers=3,udp']
+  ```
+
+  Then you can just edit away.  If you add pip dependencies or need to run a migration, just hit the "rebuild" button and it will happen automatically.
+
+  ## Port Forwarding
+
+  To view the GUI after launching the template, map your local host machine to port _8123_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+  `VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8123,,8123`
+  Where, rule1 is the friendly name of the rule, tcp is the protocol. Replace port _8123_ with the local free port of your choice.
+  After you run this command locally, browse to **http://localhost:8123** to see the GUI, as per the example.
+
+  ## DB access
+
+  If you want to make database changes while live coding, you can port forward port 5123 to your local machine:
+
+  `VBoxManage controlvm panamax-vm natpf1 rule2,tcp,,5123,,5123`
+
+  and then run `psql --host localhost --port 5123 --user docker`.
+
+  ## Default passwords
+
+  The DB has default username `docker` and password `docker`. The Wagtail admin account has username `admin` and default password `pass`.
+images:
+- name: rheinwein_pmx-pgsql
+  source: rheinwein/pmx-pgsql:latest
+  category: DB Tier
+  type: Default
+  expose:
+  - '5123'
+  ports:
+  - host_port: '5123'
+    container_port: '5432'
+    proto: TCP
+- name: cjbprime_wagtail-postgres-live_latest
+  source: cjbprime/wagtail-postgres-live:latest
+  category: Web Tier
+  type: Default
+  ports:
+  - host_port: '8123'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: rheinwein_pmx-pgsql
+    alias: db1

@@ -6,7 +6,7 @@ task :default do
   `git fetch source`
 
   diff = `git diff --stat --diff-filter=ACMRTUXB source/master`
-  modified_templates = diff.scan(/\w+.pmx/)
+  modified_templates = diff.scan(/[\w-]+.pmx/)
 
   PanamaxTemplateValidator.validate_file_list(modified_templates)
 end

@@ -1,0 +1,95 @@
+---
+name: echoplexus_ianblenke
+description: A three tier Echoplexus deployment with haproxy, multiple echoplexus application instances, and a redis container.
+keywords: echoplexus nginx redis
+type: NodeJS
+documentation: |+
+  Application Name: Echoplexus, an anonymized web based chat with whiteboard and video and the ability to gateway to IRC.
+
+  System Requirements:
+
+  Recommended 2 cores, 2G of RAM.
+
+  Setup:
+
+  There are two existing example web tier nodes in this template. As there is a shared redis backend handling the messaging, any number of copies of the web tier may be deployed.
+
+  If you are not using vagrant, be sure to replace the FQDN environment variables for both web containers to the DNS name of your panamax host.
+  The PORT and USE_PORT_IN_URL environment variables should probably remain as-is unless you're trying to use port 80.
+
+  If you wish to use HTTPS encryption, rather than enabling SSL in the app layer, take a look at enabling SSL with [tutum/haproxy](https://registry.hub.docker.com/u/tutum/haproxy/) instead.
+
+  The github README for [ianblenke/docker-echoplexus](https://github.com/ianblenke/docker-echoplexus/) has additional setup instructions that will be helpful for customizing echoplexus.
+
+  Post-Run Instructions:
+
+  Port-Forwarding:
+
+  The external access to this template is through the ports exposed via the nginx node in the Load Balancing tier. By default, port 8082 is exposed. You may wish to change this to suit your needs.
+
+  For Example: If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+   VboxManage controlvm panamax-vm natpf1 rule,tcp,,8082,,8082 or use the [Panamax wiki page instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+  Resources:
+
+  The [ianblenke/docker-echoplexus](https://github.com/ianblenke/docker-echoplexus) github repository is a great resource for this template.
+
+  Additionally, the [ianblenke/echoplexus](https://registry.hub.docker.com/u/ianblenke/echoplexus/) docker hub automatic build repository will show newer builds as they occur.
+
+images:
+- name: haproxy
+  source: tutum/haproxy:latest
+  category: Load Balancing Tier
+  type: Default
+  expose:
+  - '5000'
+  ports:
+  - host_port: '8082'
+    container_port: '5000'
+    proto: TCP
+  links:
+  - service: echoplexus1
+    alias: web1
+  - service: echoplexus2
+    alias: web2
+  environment:
+  - variable: PORT
+    value: 5000
+- name: echoplexus1
+  source: ianblenke/echoplexus:latest
+  category: Application Tier
+  type: Default
+  expose:
+  - '5000'
+  links:
+  - service: redis
+    alias: REDIS
+  environment:
+  - variable: FQDN
+    value: localhost
+  - variable: PORT
+    value: 5000
+  - variable: USE_PORT_IN_URL
+    value: true
+- name: echoplexus2
+  source: ianblenke/echoplexus:latest
+  category: Application Tier
+  type: Default
+  expose:
+  - '5000'
+  links:
+  - service: redis
+    alias: REDIS
+  environment:
+  - variable: FQDN
+    value: localhost
+  - variable: PORT
+    value: 5000
+  - variable: USE_PORT_IN_URL
+    value: true
+- name: redis
+  source: dockerfile/redis:latest
+  category: Persistence Tier
+  type: Default
+  expose:
+  - '6379'

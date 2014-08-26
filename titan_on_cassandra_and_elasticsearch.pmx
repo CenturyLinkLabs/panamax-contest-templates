@@ -1,0 +1,62 @@
+---
+name: Titan on Cassandra and Elasticsearch
+description: The Titan graph database running on the Cassandra backing store with
+  Elasticsearch as the search backend.
+keywords: elasticsearch, graph, database, titan, cassandra
+type: Java
+documentation: |
+  Titan on Cassandra and Elasticsearch
+  =======================
+  Provides access to the Rexster API for accessing the Titan graph database which in turn uses Cassandra and Elasticsearch as backends.
+
+  ###System Requirements:
+
+  Recommended 2 Cores, 6GB of RAM
+
+  ###Setup:
+
+  Should be one click and run w/ the template.  Check [apobbati/titan-rexster](https://registry.hub.docker.com/u/apobbati/titan-rexster/) and [poklet/cassandra](https://registry.hub.docker.com/u/poklet/cassandra/) for more details on using a full cassandra cluster behind titan.
+
+  ###Testing:
+  
+  Browse to http://localhost:8182/ and see if you see the cute Blueprints stack crew.  http://localhost:8182/doghouse should give you more info.
+  
+  ###Port-Forwarding:
+  To enable access to this application outside of your Docker Host use
+  `VBoxManage controlvm panamax-vm natpf1 rexster,tcp,,8182,,8182`
+  `VBoxManage controlvm panamax-vm natpf1 rexpro,tcp,,8183,,8183`
+
+  ###Resources:
+  Much respect to
+  [apobbati/titan-rexster](https://registry.hub.docker.com/u/apobbati/titan-rexster/) and [poklet/cassandra](https://registry.hub.docker.com/u/poklet/cassandra/) for containers
+  and [Aurelius](http://thinkaurelius.github.io/titan/) for Titan
+  
+  Learn more about what you can do w/ Titan and Rexster specifically here: https://github.com/tinkerpop/rexster/wiki 
+images:
+- name: rseymour_pmxcassandra_latest
+  source: rseymour/pmxcassandra:latest
+  category: DB
+  type: Default
+- name: dockerfile_elasticsearch
+  source: dockerfile/elasticsearch:latest
+  category: Search
+  type: Default
+- name: apobbati_titan-rexster
+  source: apobbati/titan-rexster:latest
+  category: GraphDB
+  type: Default
+  ports:
+  - host_port: '8182'
+    container_port: '8182'
+    proto: TCP
+  - host_port: '8183'
+    container_port: '8183'
+    proto: TCP
+  - host_port: '8184'
+    container_port: '8184'
+    proto: TCP
+  links:
+  - service: rseymour_pmxcassandra_latest
+    alias: cassandra
+  - service: dockerfile_elasticsearch
+    alias: elasticsearch

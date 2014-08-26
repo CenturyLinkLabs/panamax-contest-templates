@@ -1,0 +1,104 @@
+name:  OpenOCR
+description: Open source OCR-as-a-Service using Tesseract, Docker, and now Panamax
+keywords: rabbitmq, ocr, all, image, service
+type: Default
+documentation: |-
+  
+  ## OpenOCR
+
+  [OpenOCR](http://www.openocr.net) makes it simple to host your own OCR REST API. OCR stands for Optical character recognition. With OpenOCR you can simply convert any picture of text online until actual text data. The heavy lifting OCR work is handled by Tesseract OCR. Docker is used to containerize the various components of the service. Panamax is used to bundle the components. 
+
+  ## RabbitMQ 
+
+  [RabbitMQ](http://www.rabbitmq.com) is a robust messaging for applications. 
+
+  ### Miscellaneous
+  
+  * This template would not be possible without the amazing work done by Traun Leyden at [http://www.openocr.net](http://www.openocr.net)
+  * The original OpenOCR images built by tleyden were not used for this project in order to leverage the capabilities of Docker links and Panamax. 
+
+  ## Setup & Testing
+
+  After succesfully deploying this template, you'll have to forward only the HTTP port.
+
+  ### Port-Forwarding
+
+  If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rules:
+  ```
+  $ VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,80,,80
+  ```
+
+  ### Test the REST API
+
+  In your terminal, send the following request:
+
+  ```
+  $ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://localhost:80/ocr
+  ```
+  
+  You should obtain the decoded text for the [test image](http://bit.ly/ocrimage):
+
+  ```
+  < HTTP/1.1 200 OK
+  < Date: Tue, 13 May 2014 16:18:50 GMT
+  < Content-Length: 283
+  < Content-Type: text/plain; charset=utf-8
+  <
+  You can create local variables for the pipelines within the template by
+  preﬁxing the variable name with a “$" sign. Variable names have to be
+  composed of alphanumeric characters and the underscore. In the example
+  below I have used a few variations that work for variable names.
+  ```
+
+  ## System Requirements  
+
+  * *Memory:* 512 MB Minimum, 1GB Recommended
+  * *CPU:* 1 core Minimum, 2 core Recommended
+
+  For more documentation, please go to [http://openocr.net](http://openocr.net)
+
+authors:
+- Graham Carroll
+images:
+- category: Queue
+  name: Rabbitmq
+  source: tutum/rabbitmq:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '5672'
+    container_port: '5672'
+  - host_port: '15672'
+    container_port: '15672'
+  links: []
+  environment:
+  - variable: RABBITMQ_PASS
+    value: password
+  volumes: []
+- category: Frontend API
+  name: OCR_HTTP
+  source: tifayuki/ocr:http
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '80'
+    container_port: '80'
+  links:
+  - service: Rabbitmq
+    alias: RABBITMQ
+  environment: []
+  volumes: []
+- category: Backend Worker
+  name: OCR_WORKER
+  source: tifayuki/ocr:worker
+  description: 
+  type: Default
+  expose: []
+  ports: []
+  links:
+  - service: Rabbitmq
+    alias: RABBITMQ
+  environment: []
+  volumes: []
