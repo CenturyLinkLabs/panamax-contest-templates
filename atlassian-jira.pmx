@@ -9,7 +9,7 @@ documentation: |
 
   In order to access JIRA after running you will need to setup a port forwarding rule. To view the GUI after launching the template, map your local host machine to port 9021. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
 
-  `VBoxManage controlvm panamax-vm natpf1 jira,tcp,,8080,,9021`
+  `VBoxManage controlvm panamax-vm natpf1 jira,tcp,,8080,,9020`
 
   Setup
   -----
