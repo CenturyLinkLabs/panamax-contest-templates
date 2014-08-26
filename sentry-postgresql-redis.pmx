@@ -1,0 +1,106 @@
+---
+name: sentry-postgresql-redis
+description: "Template for a Sentry application.  \r\n\r\nApplication uses 3 linked
+  containers:\r\n\r\nslafs/sentry\r\npostgresql\r\nredis\r\n\r\nSentry is an error
+  notification service, more information here:\r\nhttps://github.com/getsentry/sentry"
+keywords: sentry exception_notification
+type: Django
+documentation: |-
+  Sentry Application
+    =============================
+
+    This application provides a running instance of Sentry along with Posgresql and Redis.
+    Based off docker image https://registry.hub.docker.com/u/slafs/sentry/
+
+    ### System Requirements
+    This is an application that consists of 3 containers linked together.
+
+    ### Setup
+
+    After starting the application, you will need to forward port 9000.
+
+    For example: `VBoxManage controlvm panamax-vm natpf1 sentry,tcp,,9000,,9000`
+
+    If you experience issues with containers not starting or you see an error like `Error response from daemon: No such container:`, try restarting with `$ panamax restart`. If that doesn't resolve the problem, you can also try the "Rebuild App" button.
+
+    You will probably want to change these variables:
+    ```
+    SENTRY_ADMIN_USERNAME=admin
+    SENTRY_ADMIN_PASSWORD=admin
+    SENTRY_ADMIN_EMAIL=admin@test.com
+    SECRET_KEY=randomvalue
+    SENTRY_URL_PREFIX=http://localhost:9000
+    ```
+
+    ### Email settings
+    ```
+    SENTRY_SERVER_EMAIL     - Address to send mail as
+    SENTRY_EMAIL_HOST       - SMTP host
+    SENTRY_EMAIL_PASSWORD   - SMTP password
+    SENTRY_EMAIL_HOST_USER  - SMTP username
+    SENTRY_EMAIL_PORT       - SMTP port
+    SENTRY_EMAIL_USE_TLS    - Set to True to enable TLS
+    ```
+
+    ### Social settings
+    ```
+    * TWITTER_CONSUMER_KEY
+    * TWITTER_CONSUMER_SECRET
+    * FACEBOOK_APP_ID
+    * FACEBOOK_API_SECRET
+    * GOOGLE_OAUTH2_CLIENT_ID
+    * GOOGLE_OAUTH2_CLIENT_SECRET
+    * GITHUB_APP_ID
+    * GITHUB_API_SECRET
+    * TRELLO_API_KEY
+    * TRELLO_API_SECRET
+    ```
+
+    ### Post-run Instructions
+
+    To access the application go to: http://localhost:9000/
+
+    ### Port Forwarding
+    If you're using Virtual Box:
+    `VBoxManage controlvm panamax-vm natpf1 sentry,tcp,,9000,,9000`
+
+    ### Resources
+    Additional resources are available at:  https://registry.hub.docker.com/u/slafs/sentry/ and https://github.com/getsentry/sentry
+images:
+- name: slafs_sentry_latest
+  source: slafs/sentry:latest
+  type: Default
+  expose:
+  - '9000'
+  ports:
+  - host_port: '9000'
+    container_port: '9000'
+    proto: TCP
+  links:
+  - service: postgres_1
+    alias: postgresdb
+  - service: redis
+    alias: redis
+  environment:
+  - variable: SECRET_KEY
+    value: randomvalue
+  - variable: SENTRY_URL_PREFIX
+    value: http://localhost:9000
+  - variable: DATABASE_URL
+    value: postgres://postgres:@postgresdb/postgres
+  - variable: SENTRY_REDIS_HOST
+    value: redis
+  - variable: CACHE_URL
+    value: hiredis://redis:6379/2/
+  - variable: SENTRY_ADMIN_USERNAME
+    value: admin
+  - variable: SENTRY_ADMIN_PASSWORD
+    value: admin
+  - variable: SENTRY_ADMIN_EMAIL
+    value: test@test.com
+- name: postgres_1
+  source: postgres:latest
+  type: Default
+- name: redis
+  source: redis:latest
+  type: Default
