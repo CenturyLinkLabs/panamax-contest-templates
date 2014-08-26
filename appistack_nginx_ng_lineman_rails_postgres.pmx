@@ -1,0 +1,69 @@
+---
+name: Appistack
+description: Opinionated Ng-Rails with Lineman, PostgreSQL and Redis
+keywords: angular, ng, ruby, rails, lineman, postgresql, redis, all
+recommended:
+type: Rails
+documentation: |
+  Appistack: Opinionated Angular-Rails
+  =========
+
+  ##Port Forwarding
+  To view the GUI after launching the template, map your local host machine to port _8080_. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,8997,,8080`
+
+  Where, rule1 is the friendly name of the rule, tcp is the protocol. Replace port _8997_ with the local free port of your choice.
+
+  After you run this command locally, browse to **http://localhost:8997** to see the GUI, as per the example.
+images:
+- name: DB_1
+  category: DB Tier
+  source: dharmamike/pmx-pgsql:latest
+  description: PostgreSQL
+  type: Default
+  expose: []
+  ports:
+  - host_port: '5432'
+    container_port: '5432'
+  links: []
+  environment: []
+  volumes: []
+- name: Redis_1
+  category: DB Tier
+  source: sameersbn/redis:latest
+  type: Default
+- name: Rails41_1
+  category: Rails41 API
+  source: dcunited001/appistack-rails41:latest
+  description: Appistack Rails API
+  type: Default
+  expose: []
+  ports:
+  - host_port: '8080'
+    container_port: '3000'
+  links:
+  - service: DB_1
+    alias: DB_1
+  - service: Redis_1
+    alias: Redis_1
+  environment: []
+  volumes: []
+# - name: Work41_1
+#   category: Rails41 Workers
+#   source: dcunited001/appistack-rails41
+#   description: Appistack Rails Workers
+#   type: Default
+#   expose: []
+#   ports:
+#   - host_port: '8080'
+#     container_port: '3000'
+#   links:
+#   - service: DB_1
+#     alias: DB_1
+#   - service: Redis_1
+#     alias: Redis_1
+#   environment: []
+#   volumes: []
+#   command: 'QUEUES=* bundle exec rake resque:work'
+
