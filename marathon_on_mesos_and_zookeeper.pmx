@@ -1,0 +1,82 @@
+---
+name: Marathon on Mesos and Zookeeper
+description: Runs Marathon along with a Mesos master, two slaves, and a Zookeeper
+  instance.
+keywords: marathon, mesos, mesosphere, zookeeper
+type: Default
+documentation: |
+  ### Marathon on Mesos and Zookeeper
+
+  * **What it runs:** Runs Marathon along with a Mesos master, two slaves, and a Zookeeper instance.
+
+  * **System Requirements:** Recommended 2 Cores, 4GB of RAM
+
+  * **Setup:** Unfortunately, Panamax templates do not save Docker run commands. Thus, you will need to manually enter some information that is not in the template into the "Docker run command" field of various services.
+
+    * Mesos master: `mesos-master --zk=zk://zk1:2181/mesos --log_dir=/logs`
+    * Mesos slave 1: `mesos-slave --master=mesosm1:5050 --port=5051 --log_dir=/logs`
+    * Mesos slave 2: `mesos-slave --master=mesosm1:5050 --port=5052 --log_dir=/logs`
+    * Marathon: `--master zk://zk1:2181/mesos --zk zk://zk1:2181/marathon`
+
+  * **Port forwarding:** To enable access to this application outside of your Docker Host, please make sure you have access to the ports for Mesos and Marathon. If using Virtual Box, use the following command in your local machine's terminal window to create the [port forwarding rules](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox):
+
+      VBoxManage controlvm panamax-vm natpf1 mesos,tcp,,5050,,5050
+      VBoxManage controlvm panamax-vm natpf1 marathon,tcp,,8080,,8080
+
+  * **Your first Marathon app:** I recommend running the [Test App Commands on the Marathon wiki](https://github.com/mesosphere/marathon/wiki/Test-App-Commands) to get started. These are simple commands with no dependencies that you can use to see what a running Marathon app looks like.
+
+  * **Resources:** [Running Marathon and Mesos with Panamax](http://www.benmccann.com/blog/running-marathon-and-mesos-with-panamax/)
+images:
+- name: jplock_zookeeper_latest
+  source: jplock/zookeeper:latest
+  category: Mesos Master
+  type: Default
+- name: redjack_mesos-master
+  source: redjack/mesos-master:latest
+  category: Mesos Master
+  type: Default
+  ports:
+  - host_port: '5050'
+    container_port: '5050'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper_latest
+    alias: zk1
+  volumes:
+  - host_path: "/mesosm1"
+    container_path: "/logs"
+- name: superguenter_marathon
+  source: superguenter/marathon:latest
+  category: Mesos Master
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: jplock_zookeeper_latest
+    alias: zk1
+- name: redjack_mesos-slave
+  source: redjack/mesos-slave:latest
+  category: Mesos Slaves
+  type: Default
+  expose:
+  - '5051'
+  links:
+  - service: redjack_mesos-master
+    alias: mesosm1
+  volumes:
+  - host_path: "/mesoss1"
+    container_path: "/logs"
+- name: redjack_mesos-slave_1
+  source: redjack/mesos-slave:latest
+  category: Mesos Slaves
+  type: Default
+  expose:
+  - '5052'
+  links:
+  - service: redjack_mesos-master
+    alias: mesosm1
+  volumes:
+  - host_path: "/mesoss2"
+    container_path: "/logs"
