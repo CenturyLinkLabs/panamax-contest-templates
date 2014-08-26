@@ -1,0 +1,85 @@
+---
+name: couchbase-elasticsearch
+description: 'Couchbase 2.2 and Elasticsearch 1.0.1 with 2 nodes each'
+keywords: 'couchbase elasticsearch'
+type: none
+documentation: '
+View couchbase1 on port 4091 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,4091,,4091
+View couchbase2 on port 5091 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,5091,,5091
+View elasticsearch1 on port 4200 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,4200,,4200
+View elasticsearch2 on port 5200 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,5200,,5200
+(Change the first 4091/59091/4200/5200 to view it on a diffrent port)
+
+Couchbase with elasticsearch added to the XDCR
+
+ENV Variables - For couchbase
+
+ENV CB_USERNAME		Administrator
+ENV CB_PASSWORD		couchbase
+ENV CB_SIZE         256
+
+ENV ES_USERNAME     Administrator
+ENV ES_PASSWORD     couchbase
+
+
+ENV Variables - For elasticsearch
+
+ENV ES_USERNAME		Administrator
+ENV ES_PASSWORD		couchbase
+
+Make sure the ES username/password match in couchbase and elasticsearch so couchbase can connect
+'
+images:
+- name: couchbase1
+  source: corbinu/docker-couhbase:2.2
+  category: DB
+  type: Default
+  expose:
+  - '11211 11210 11209 4369 8091 8092 21100 21101 21198 21199'
+  ports:
+  - host_port: '4091'
+    container_port: '8091'
+    proto: TCP
+  volumes:
+  - host_path: ''
+    container_path: "/opt/couchbase/var"
+  links:
+  - service: elasticsearch1
+    alias: elasticsearch
+- name: couchbase2
+  source: corbinu/docker-couhbase:2.2
+  category: DB
+  type: Default
+  expose:
+  - '11211 11210 11209 4369 8091 8092 21100 21101 21198 21199'
+  ports:
+  - host_port: '5091'
+    container_port: '8091'
+    proto: TCP
+  volumes:
+  - host_path: ''
+    container_path: "/opt/couchbase/var"
+  links:
+  - service: couchbase1
+    alias: couchbase
+- name: elasticsearch1
+  source: corbinu/docker-phpmyadmin:4.2.7.1
+  category: Search
+  expose:
+  - '9091'
+  type: Default
+  ports:
+  - host_port: '4200'
+    container_port: '9200'
+    proto: TCP
+- name: elasticsearch2
+  source: corbinu/docker-phpmyadmin:4.2.7.1
+  category: Search
+  type: Default
+  ports:
+  - host_port: '5200'
+    container_port: '9200'
+    proto: TCP
+  links:
+  - service: elasticsearch1
+    alias: elasticsearch
