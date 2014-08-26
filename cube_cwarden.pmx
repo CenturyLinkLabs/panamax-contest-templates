@@ -1,0 +1,64 @@
+---
+name: cube
+description: 'The cube event logging server.'
+keywords: 'logging, cube, events'
+type: Default
+documentation: |-
+  # Cube Event Logging Server
+
+  Starts a MongoDB server, [cube collector](https://github.com/square/cube/wiki/Collector), and [cube evaluator](https://github.com/square/cube/wiki/Evaluator).
+
+  ### System Requirements
+  
+  Give panamax-vm at least 2GB of RAM (`export PMX_VM_MEMORY=2048` in `~/.panamax/.env`)
+
+  ### Port Forwarding
+
+  Expose Collector and Evaluator
+
+       $ VBoxManage controlvm panamax-vm natpf1 collector,tcp,,1080,,1080
+       $ VBoxManage controlvm panamax-vm natpf1 evaluator,tcp,,1081,,1081
+
+
+  ### Use Cube
+
+  Send some test events to the collector, e.g.
+
+       $ for i in {1..5000}; do curl --silent -H "Content-Type: application/json" -X POST -d '[{"type":"test"}]' http://localhost:1080/1.0/event/put; done
+  
+  Visit the evaluator at `http://localhost:1081`.
+  
+  Log events from your app using a [library](https://github.com/square/cube/wiki/Tools) or [curl](https://github.com/square/cube/wiki/Collector#event_put).
+
+
+  ### Resources
+
+  * Customize your time series visualizations using [Cubism](https://github.com/square/cubism)
+  * Create a simple dashboard using [cube-dashboard](https://github.com/jgallen23/cube-dashboard)
+images:
+- name: robinvdvleuten_mongo_latest
+  source: robinvdvleuten/mongo:latest
+  category: Database
+  type: Default
+- name: cwarden_cube-collector
+  source: cwarden/cube-collector:latest
+  category: Apps
+  type: Default
+  ports:
+  - host_port: '1080'
+    container_port: '1080'
+    proto: TCP
+  links:
+  - service: robinvdvleuten_mongo_latest
+    alias: mongodb
+- name: cwarden_cube-evaluator
+  source: cwarden/cube-evaluator:latest
+  category: Apps
+  type: Default
+  ports:
+  - host_port: '1081'
+    container_port: '1080'
+    proto: TCP
+  links:
+  - service: robinvdvleuten_mongo_latest
+    alias: mongodb
