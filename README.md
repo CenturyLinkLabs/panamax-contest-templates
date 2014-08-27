@@ -4,6 +4,8 @@ _**The contest submission period has ended. Part 2 (a.k.a. "Shamelessly promote 
 
 [Panamax](http://panamax.io) is a containerized app creator with an open-source app marketplace hosted in GitHub. Panamax provides a friendly interface for users of Docker, Fleet & CoreOS. With Panamax, you can easily create, share, and deploy any containerized app no matter how complex it might be. Learn more at [Panamax.io](http://panamax.io) or browse the [Panamax Wiki](https://github.com/CenturyLinkLabs/panamax-ui/wiki).
 
+### NOTE: [CONTEST](http://panamax.io/contest/) SUBMISSION PERIOD IS OVER.
+
 # Panamax Contest Template Repo
 [![Build Status](https://api.shippable.com/projects/53e29b2d4f881a8700879052/badge/master)](https://www.shippable.com/projects/53e29b2d4f881a8700879052)
 
