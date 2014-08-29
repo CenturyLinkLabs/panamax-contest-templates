@@ -3,7 +3,7 @@ name: Magento
 description: This Magento Panamax template helps you setup a neat magento installation
   that has all production measures by default . Database & Caching are separated from
   the web layer.
-keywords: Magento Panamax MariaDB MySQL Memcached Production Scalable Ecommerce Platform
+keywords: Magento, Panamax, MariaDB, MySQL, Memcached, Production, Scalable, Ecommerce Platform
 type: Magento
 documentation: |+
   ##Application Name:
