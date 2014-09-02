@@ -1,7 +1,7 @@
 ---
 name: couchbase-elasticsearch
 description: 'Couchbase 2.2 and Elasticsearch 1.0.1 with 2 nodes each'
-keywords: 'couchbase elasticsearch'
+keywords: 'couchbase, elasticsearch'
 type: none
 documentation: '
 View couchbase1 on port 4091 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,4091,,4091
