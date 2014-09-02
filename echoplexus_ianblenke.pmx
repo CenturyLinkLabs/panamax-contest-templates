@@ -1,7 +1,7 @@
 ---
 name: echoplexus_ianblenke
 description: A three tier Echoplexus deployment with haproxy, multiple echoplexus application instances, and a redis container.
-keywords: echoplexus nginx redis
+keywords: echoplexus, nginx, redis
 type: NodeJS
 documentation: |+
   Application Name: Echoplexus, an anonymized web based chat with whiteboard and video and the ability to gateway to IRC.
