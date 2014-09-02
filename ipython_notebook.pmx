@@ -1,7 +1,7 @@
 ---
 name: ipython notebook
 description: This is a basic ipython notebook.
-keywords: ipython python
+keywords: ipython, python
 type: Default
 documentation: |- 
  The [IPython notebook](http://ipython.org) modified slightly to play well with panamax.
