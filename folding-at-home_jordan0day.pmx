@@ -2,7 +2,7 @@
 name: folding-at-home_jordan0day
 description: Folding@Home Client, with customizable username, team, and power environment
   variables.
-keywords: folding protein
+keywords: folding, protein
 type: Default
 documentation: |+
   Folding@Home
