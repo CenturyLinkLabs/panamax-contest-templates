@@ -12,7 +12,7 @@ _**The contest submission period has ended. Part 2 (a.k.a. "Shamelessly promote 
 Repo of the panamax template contest submissions. See: [panamax.io/contest](http://panamax.io/contest) for more information.
 
 **This repository is a default source in Panamax**, which means these templates are available to all panamax users.
-This repository will likely be emptied after the contest. If you make a template that you think would be helpfull to Panamax users going forward, submit a PR to: https://github.com/CenturyLinkLabs/panamax-public-templates, however public templates will not be judged in the contest, so start here, then consider merging to public after the contest.
+This repository will likely be emptied after the contest. If you make a template that you think would be helpful to Panamax users going forward, submit a PR to: https://github.com/CenturyLinkLabs/panamax-public-templates, however public templates will not be judged in the contest, so start here, then consider merging to public after the contest.
 
 [Learn more about what we think makes a good image and template.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/Panamax-Public-Templates)
 
