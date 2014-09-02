@@ -1,7 +1,7 @@
 ---
 name: mysql-phpmyadmin
 description: 'MySQL 5.6 and PhpMyAdmin 4.2.7.1'
-keywords: 'mysql phpmyadmin'
+keywords: 'mysql, phpmyadmin'
 type: MySQL
 documentation: '
 View it on port 3000 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,3000,,3000
