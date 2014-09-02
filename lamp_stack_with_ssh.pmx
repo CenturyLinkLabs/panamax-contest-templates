@@ -3,7 +3,7 @@ name: LAMP stack with SSH
 description: Uses MySQL, Apache/PHP and SSH to create a containerized LAMP stack for
   building PHP websites.  Log in using SSH to edit the shared files on the Apache/PHP
   container or install mysql-client to access the MySQL database directly.
-keywords: LAMP scratch ssh apache php
+keywords: LAMP, scratch, ssh, apache, php
 type: LAMP
 documentation: |
   ### Documentation for Panamax LAMP stack
