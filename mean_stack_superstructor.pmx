@@ -1,7 +1,7 @@
 ---
 name: mean_stack_superstructor
 description: MEAN.io stack as a Panamax template.
-keywords: mean.io mean node.js nodejs mongodb
+keywords: mean.io, mean, node.js, nodejs, mongodb
 type: NodeJS
 documentation: |
   MEAN.io Stack Template
