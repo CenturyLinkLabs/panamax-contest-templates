@@ -1,7 +1,7 @@
 ---
 name: opennms_postgresql_ianblenke
 description: An OpenNMS application tier backended by a linked PostgreSQL database
-keywords: opennms tomcat java postgresql
+keywords: opennms, tomcat, java, postgresql
 type: Default
 documentation: |
   Application Name: OpenNMS, a SNMP capable web administered Network Management Engine with a PostgresSQL relational backend
