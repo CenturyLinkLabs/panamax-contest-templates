@@ -3,7 +3,7 @@ name: sentry-postgresql-redis
 description: "Template for a Sentry application.  \r\n\r\nApplication uses 3 linked
   containers:\r\n\r\nslafs/sentry\r\npostgresql\r\nredis\r\n\r\nSentry is an error
   notification service, more information here:\r\nhttps://github.com/getsentry/sentry"
-keywords: sentry exception_notification
+keywords: sentry, exception notification
 type: Django
 documentation: |-
   Sentry Application
