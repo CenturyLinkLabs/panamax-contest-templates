@@ -2,7 +2,7 @@
 name: huginn_ianblenke
 description: A three tier Huginn deployment with haproxy, two Huggin application containers,
   and a mysql container.
-keywords: huginn haproxy mysql
+keywords: huginn, haproxy, mysql
 type: Rails
 documentation: |+
   Application Name: Huginn, an IFTTT / Zapier opensource alternative.
