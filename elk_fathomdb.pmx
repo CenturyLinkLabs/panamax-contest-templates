@@ -1,0 +1,98 @@
+---
+name: ELK stack; searchable syslog
+description: Logstash with elasticsearch
+keywords: elk, logging, elasticsearch, logstash, kibana, syslog
+type: Default
+documentation: |-
+  # The ELK stack, made easy
+
+  The ELK stack (ElasticSearch, Logstash, Kibana) is the easiest way to index your log files.
+
+  It can be complicated to set everything up though!  With this easy Panamax template, everything is set up for you.
+
+  Just tell your app/system to send syslog data in on port 514, and it will Pana-magically be indexed and searchable from a browser.
+
+  ## Instructions
+
+  Just run this template from Panamax!
+  
+  If you're using VirtualBox/Vagrant, you'll need to tell VirtualBox to expose port 8080 (HTTP) and port 8514 (syslog).
+  
+  ```
+  VBoxManage controlvm panamax-vm natpf1 rule8080,tcp,,8080,,8080
+  ```
+  ```
+  VBoxManage controlvm panamax-vm natpf1 rule8514,tcp,,8514,,8514
+  ```
+
+  You can manually log a message from the command line like this:
+  ```
+  logger -n 127.0.0.1 -p 8514 Hello from Panamax
+  ```
+  ```
+  logger -n 127.0.0.1 -p 8514 Hello from CoreOS
+  ```
+  ```
+  logger -n 127.0.0.1 -p 8514 Hello from Docker
+  ```
+
+  Then, open the browser to [localhost:8080](http://127.0.0.1:8080), and you should see Kibana.  Try searching for 'Panamax', 'CoreOS', 'Docker' and 'Hello'.
+
+  You can use Kibana & syslog from anywhere on your local network: you just need to change 127.0.0.1 to your machine's IP address.
+
+  ## Resources
+
+  [Logging from the command line to syslog](http://www.cyberciti.biz/tips/howto-linux-unix-write-to-syslog.html)
+
+  [Logging from Ruby to syslog](http://help.papertrailapp.com/kb/configuration/configuring-centralized-logging-from-ruby-on-rails-apps/)
+
+  [Logging from Java to syslog](https://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/net/SyslogAppender.html)
+
+  [Logging from Linux to syslog](http://help.papertrailapp.com/kb/configuration/configuring-remote-syslog-from-unixlinux-and-bsdos-x/)
+
+  ##System Requirements
+
+  Indexing can be fairly demanding.  Recommended: 2 Cores, 2GB of RAM, enough disk space to store your log files (estimate the raw size times two).
+
+  More CPU and RAM will give you faster results!
+
+  ##Setup, Post-run & Port forwarding
+
+  Just run the template!  All the configuration options have been set to sensible defaults.
+
+  If you're on VirtualBox, you should open up port 80 and port 512 as documented above.
+
+  ##Testing
+
+  Try the logger commands and Kibana instructions above; if something doesn't work right please let me know!
+
+images:
+- name: elasticsearch
+  source: dockerfile/elasticsearch:latest
+  category: Storage Tier
+  type: Default
+- name: logstash
+  source: arcus/logstash:latest
+  category: Logging tier
+  type: Default
+  expose:
+  - '8514'
+  ports:
+  - host_port: '8514'
+    container_port: '514'
+  links:
+  - service: elasticsearch
+    alias: es
+- name: kibana
+  source: arcus/kibana:latest
+  category: Front-end Tier
+  type: Default
+  expose:
+  - '8080'
+  ports:
+  - host_port: '8080'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: elasticsearch
+    alias: es

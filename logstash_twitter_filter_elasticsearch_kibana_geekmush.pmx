@@ -1,0 +1,141 @@
+---
+name: logstash_twitter_filter_elasticsearch_kibana_geekmush
+description: "This template provides examples of several applications working together,
+  and can also be used as a basis for any of the 3 applications individually.\r\n\r\nAt
+  the base is a flexible ElasticSearch cluster configuration (usably scalable to 8
+  nodes with the example config), utilizing environmental variables and linking for
+  the critical information to complete the ES configuration files.\r\n\r\nUsing the
+  ES cluster is an example container showing how to implement the Twitter plugin on
+  LogStash to search the Twitter feed for terms of interest.  That LogStash container
+  finds the ElasticSearch cluster through links and environmental variables controlled
+  via Panamax.\r\n\r\nFinally, there is a Web UI container providing the Kibana front
+  end running on an Nginx webserver - also, configured through the Panamax interface."
+keywords: LogStash, ElasticSearch, Kibana, Twitter, Nginx
+type: Default
+documentation: |-
+  Application Name: twitter-filter, a LogStash based filter of the Twitter stream based upon specified keywords, stored into an ElasticSearch cluster.
+
+  System Requirements:
+
+  Recommended 2 cores, 4G of RAM.
+
+  Setup:
+  This template consists of a data storage (ElasticSearch), data input (LogStash pulling in filtered Twitter data), and a Web UI for reviewing the data (Kibana3 on Nginx).
+
+  Prior to deploying, the following environmental variables must be configured for each of the ElasticSearch containers:
+
+    ES_CLUSTER_NAME  (select something unique and use for all containers in the template)
+
+  On the primary ES container (es1), you also need to create a Port Binding to expose port 9200 to the public world (in a Production environment, this would be authenticated and protected by a web proxy).
+
+  For the LogStash container:
+
+    TWITTER_CONSUMER_KEY
+    TWITTER_CONSUMER_SECRET
+    TWITTER_OAUTH_TOKEN
+    TWITTER_OAUTH_TOKEN_SECRET
+    ES_CLUSTER_NAME
+
+  The Twitter API credentials can be obtained by creating an application at http://dev.twitter.com.
+
+  And, finally, for the Kibana container:
+
+    ES_HOST  (set this to the public IP or FQDN of the ES1 container**)
+
+  The Kibana container will need some Port Bindings so that you can access the server externally, the example maps dockerhost:8888->container:80
+
+  ** - if you cannot directly contact the ES1 container on port 9200, you may need to do something like an ssh port redirect (or VBox commands if using Vagrant) as the Kibana application has the end user's browser directly contact the ElasticSearch cluster.
+
+  You may run 1 or more ElasticSearch nodes in this example, with each additional node only requiring the ES_CLUSTER_NAME variable and a link to the primary ES node (es1).  The configuration in this example would have usable increased performance out to 8 cluster nodes (#shards = 8).
+
+  The twitter keywords are currently hardcoded into the twitter plugin configuration in the Dockerfile, but replacing them with an Environmental Variable should not be difficult.  The example configuration looks for tweets containing: "docker" and "panamax".
+
+  One known issue to note:  The current LogStash Twitter plugin has a bug that causes it to fail on certain tweets (exact root cause is not yet known and has not been addressed by the developers), but the LogStash application will attempt to reconnect and continue scanning for tweets of interest.  However, occasionally, the failure and reconnect occur too quickly and Twitter will disallow the connections (which with then subsequently fail over and over … Panamax needs a "pause" button!!).  Deleting the application and letting everything cool down _should_ fix the issue.
+
+  Post-Run Instructions:
+
+  Port-Forwarding:
+
+  The default ports requiring access are 8888 (Kibana Web UI) and 9200 (ES1, required for the End User's web browser to work with Kibana)
+
+  For Example: If using Virtual Box, use the following command in your local machine’s terminal window to create the port forwarding rule: VboxManage controlvm panamax-vm natpf1 rule,tcp,,8888,,8888 or use the Panamax wiki page instructions
+
+  Resources:
+  elasticsearch.org is the home for LogStash, ElasticSearch, and Kibana.
+
+  See dev.twitter.com for information about obtaining a Twitter API credential set.
+images:
+- name: es1
+  source: geekmush/docker-elasticsearch:latest
+  category: ES Cluster
+  type: Default
+  expose:
+  - '9200'
+  - '9300'
+  ports:
+  - host_port: '9200'
+    container_port: '9200'
+    proto: TCP
+  environment:
+  - variable: ES_CLUSTER_NAME
+    value: "%%ES_CLUSTER_NAME%%"
+- name: es2
+  source: geekmush/docker-elasticsearch:latest
+  category: ES Cluster
+  type: Default
+  expose:
+  - '9200'
+  - '9300'
+  links:
+  - service: es1
+    alias: es1
+  environment:
+  - variable: ES_CLUSTER_NAME
+    value: "%%ES_CLUSTER_NAME%%"
+- name: es3
+  source: geekmush/docker-elasticsearch:latest
+  category: ES Cluster
+  type: Default
+  expose:
+  - '9200'
+  - '9300'
+  links:
+  - service: es1
+    alias: es1
+  environment:
+  - variable: ES_CLUSTER_NAME
+    value: "%%ES_CLUSTER_NAME%%"
+- name: logstash-twitter
+  source: geekmush/docker-logstash-twitter:latest
+  category: LS Twitter Search
+  type: Default
+  links:
+  - service: es1
+    alias: es1
+  environment:
+  - variable: TWITTER_CONSUMER_KEY
+    value: "%%TWITTER_CONSUMER_KEY%%"
+  - variable: TWITTER_CONSUMER_SECRET
+    value: "%%TWITTER_CONSUMER_SECRET%%"
+  - variable: TWITTER_OAUTH_TOKEN
+    value: "%%TWITTER_OAUTH_TOKEN%%"
+  - variable: TWITTER_OAUTH_TOKEN_SECRET
+    value: "%%TWITTER_OAUTH_TOKEN_SECRET%%"
+  - variable: ES_CLUSTER_NAME
+    value: "%%ES_CLUSTER_NAME%%"
+- name: kibana
+  source: geekmush/docker-kibana:latest
+  category: Kibana Web UI
+  type: Default
+  expose:
+  - '80'
+  ports:
+  - host_port: '8888'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: es1
+    alias: es1
+  environment:
+  - variable: ES_HOST
+    value: "%%PUBLIC_IP_OF_ES1%%"

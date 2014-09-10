@@ -1,0 +1,55 @@
+---
+name: mysql-phpmyadmin
+description: 'MySQL 5.6 and PhpMyAdmin 4.2.7.1'
+keywords: 'mysql, phpmyadmin'
+type: MySQL
+documentation: '
+View it on port 3000 by running VBoxManage controlvm panamax-vm natpf1 rule1,tcp,,3000,,3000
+(Change the first 3000 to view it on a diffrent port)
+
+A great base for any MySQL backed application.
+ENV Variables
+MYSQL_ROOT_PASSWORD - sets the mysql root password
+PMA_SECRET - blowfish secrete for PhpMyAdmin
+PMA_USERNAME - Username to for PhpMyAdmin internal tables
+PMA_PASSWORD - Password to for the PhpMyAdmin internal tables
+MYSQL_USERNAME - Username with which to create the PhpMyAdmin internal user and tables
+MYSQL_PASSWORD - Password with which to create the PhpMyAdmin internal user and tables
+
+After creation a mysql username and password should be created and the root user locked down.
+'
+images:
+- name: mysql
+  source: mysql:5.6.20
+  category: DB
+  type: Default
+  expose:
+  - '3306'
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: password
+  volumes:
+  - host_path: ''
+    container_path: "/var/lib/mysql"
+- name: phpmyadmin
+  source: corbinu/docker-phpmyadmin:4.2.7.1
+  category: Web
+  type: Default
+  ports:
+  - host_port: '3000'
+    container_port: '80'
+    proto: TCP
+  links:
+  - service: mysql
+    alias: mysql
+  environment:
+  - variable: PMA_SECRET
+    value: blowfish_secret
+  - variable: PMA_USERNAME
+    value: pma
+  - variable: PMA_PASSWORD
+    value: password
+  - variable: MYSQL_USERNAME
+    value: root
+  - variable: MYSQL_PASSWORD
+    value: password

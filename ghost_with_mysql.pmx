@@ -1,0 +1,44 @@
+---
+name: Ghost with MySQL
+description: 'no description'
+keywords: ''
+type: NodeJS
+documentation: |-
+  The alias for the link between Ghost and MySQL needs to be DB_1. If this is changed, the template will not work.
+
+  Also, the password can be changed, but the environmental variables need to be changed on both services.
+
+  To view the GUI after launching the template, map your local host machine to port 8080. If using Virtual Box, use the following command in your terminal to create the port forwarding rule:
+
+  `VBoxManage controlvm panamax-vm natpf1 ghost,tcp,,8997,,8080`
+
+  Where, ghost is the friendly name of the rule, tcp is the protocol. Replace port 8997 with the local free port of your choice. If you change the port bindings on the Ghost service, 8080 will need to be changed to match that too.
+
+  After you run this command locally, browse to `http://localhost:8997` to see the GUI, as per the example.
+images:
+- name: dockerfile_ghost_latest
+  source: dockerfile/ghost:latest
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '2368'
+    proto: TCP
+  links:
+  - service: centurylink_mysql
+    alias: centurylink_mysql
+  environment:
+  - variable: DB_PASSWORD
+    value: pass@word01
+  - variable: DB_NAME
+    value: ghost
+- name: centurylink_mysql
+  source: centurylink/mysql:5.5
+  category: DB Tier
+  type: Default
+  ports:
+  - host_port: '3306'
+    container_port: '3306'
+    proto: TCP
+  environment:
+  - variable: MYSQL_ROOT_PASSWORD
+    value: pass@word01

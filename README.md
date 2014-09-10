@@ -1,6 +1,10 @@
 # Panamax: Docker Management for Humans
 
+_**The contest submission period has ended. Part 2 (a.k.a. "Shamelessly promote your template") begins Tuesday September 2nd.**_
+
 [Panamax](http://panamax.io) is a containerized app creator with an open-source app marketplace hosted in GitHub. Panamax provides a friendly interface for users of Docker, Fleet & CoreOS. With Panamax, you can easily create, share, and deploy any containerized app no matter how complex it might be. Learn more at [Panamax.io](http://panamax.io) or browse the [Panamax Wiki](https://github.com/CenturyLinkLabs/panamax-ui/wiki).
+
+### NOTE: [CONTEST](http://panamax.io/contest/) SUBMISSION PERIOD IS OVER.
 
 # Panamax Contest Template Repo
 [![Build Status](https://api.shippable.com/projects/53e29b2d4f881a8700879052/badge/master)](https://www.shippable.com/projects/53e29b2d4f881a8700879052)
@@ -8,9 +12,11 @@
 Repo of the panamax template contest submissions. See: [panamax.io/contest](http://panamax.io/contest) for more information.
 
 **This repository is a default source in Panamax**, which means these templates are available to all panamax users.
-This repository will likely be emptied after the contest. If you make a template that you think would be helpfull to Panamax users going forward, submit a PR to: https://github.com/CenturyLinkLabs/panamax-public-templates, however public templates will not be judged in the contest, so start here, then consider merging to public after the contest.
+This repository will likely be emptied after the contest. If you make a template that you think would be helpful to Panamax users going forward, submit a PR to: https://github.com/CenturyLinkLabs/panamax-public-templates, however public templates will not be judged in the contest, so start here, then consider merging to public after the contest.
 
 [Learn more about what we think makes a good image and template.](https://github.com/CenturyLinkLabs/panamax-ui/wiki/Panamax-Public-Templates)
+
+_**The contest submission period has ended. Part 2 (a.k.a. "Shamelessly promote your template") begins Tuesday September 2nd.**_
 
 ## How to Submit a Contest Entry
 1. Install Panamax using the directions from  http://panamax.io/get-panamax

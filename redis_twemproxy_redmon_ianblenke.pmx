@@ -6,7 +6,7 @@ description: "A redmon application tier with a twemproxy redis proxy tier and a 
   the redis servers and twemproxy port are stored in the panamax fleet's etcd key/value
   store. Alternatively, by attaching a progrium/consul linkage, twemproxy will auto-discover
   and use console for the key/value store."
-keywords: redis twemproxy redmon etcd consul
+keywords: redis, twemproxy, redmon, etcd, consul
 type: Default
 documentation: |+
   Application Name: [twemproxy](https://github.com/twitter/twemproxy), [redis](http://redis.io), and [redmon](https://github.com/steelThread/redmon) - an example of a scalable clustered redis backend with a redis web admin interface frontend.

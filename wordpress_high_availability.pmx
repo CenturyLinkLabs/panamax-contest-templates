@@ -1,0 +1,110 @@
+name: Wordpress - High Availability 
+description: A Wordpress that can scale horizontally and is load balanced using HAProxy
+keywords: wordpress, mysql, haproxy, horizontal scaling
+recommended: false
+type: Default
+documentation: |-
+  ## MySQL
+  
+  [MySQL](http://www.mysql.com) is the world's most popular open source database.
+
+  ## WordPress
+
+  [WordPress](http://wordpress.org/) is a web software you can use to create a beautiful website or blog. 
+  
+  ## HAProxy
+
+  [HAProxy](http://www.haproxy.org/) is a reliable, high performance TCP/HTTP load balancer
+   
+  ## Why this template?
+
+  This template give you a real world example that how to use docker and Panamax template to quickly set up a classic 3-layer web application cluster.
+
+  ## System Requirements
+
+  * *RAM:* 512 MB Minimum, 1GB Recommended, 2GB Preferred
+  * *Cores:* 1 core Minimum, 2 core Recommended
+
+  # Images used
+
+  tutum/mysql:latest				The most popular and easy to use mysql image on docker hub.
+  tutum/wordpress-stackable:latest		A WordPress images that can connect to other database like MySQL, MariaDB.
+  tutum/haproxy:latest				A well maintained load balancer, easy to use by simply linking to it.
+  
+  # Setup and access
+  
+  Run this template under Panamax and you can access the load balanced WordPress on http://localhost/
+
+  # Scalability
+
+  You can add more WordPress instances to the cluster by adding more sections described in the template under category: Application Tier, and add a corresponding link in category: Load Balancer Tier.
+
+  # Note:
+
+  * By default, the media uploaded to WordPress is stored inside container's file system, not int the database. Thus, an image uploaded to one container may not be accessible by the other container.
+  * To solve this, we use volume to share the `/app/wp-content` folder.
+  * To avoid permission problems, please ensure that `/app/wp-contents` exists on your Panamax host before launching this template.
+
+authors:
+- ''
+images:
+- category: DB Tier
+  name: db
+  source: tutum/mysql:latest
+  description: 
+  type: Default
+  expose: []
+  ports: []
+  links: []
+  environment:
+  - variable: MYSQL_PASS
+    value: password
+  volumes: []
+- category: Application Tier
+  name: wp1
+  source: tutum/wordpress-stackable:latest
+  description: 
+  type: Default
+  expose: []
+  ports: []
+  links:
+  - service: db
+    alias: db
+  environment: 
+  - variable: DB_PASS
+    value: password
+  volumes:
+  - host_path: "/home"
+    container_path: "/app/wp-content"
+- category: Application Tier
+  name: wp2
+  source: tutum/wordpress-stackable:latest
+  description: 
+  type: Default
+  expose: []
+  ports: []
+  links:
+  - service: db
+    alias: db
+  environment: 
+  - variable: DB_PASS
+    value: password
+  volumes:
+  - host_path: "/home"
+    container_path: "/app/wp-content"
+- category: Load Balancer Tier
+  name: lb
+  source: tutum/haproxy:latest
+  description: 
+  type: Default
+  expose: []
+  ports:
+  - host_port: '80'
+    container_port: '80'
+  links:
+  - service: wp1
+    alias: wp1
+  - service: wp2
+    alias: wp2  
+  environment: []
+  volumes: []

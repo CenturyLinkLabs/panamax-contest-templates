@@ -1,0 +1,67 @@
+---
+name: opennms_postgresql_ianblenke
+description: An OpenNMS application tier backended by a linked PostgreSQL database
+keywords: opennms, tomcat, java, postgresql
+type: Default
+documentation: |
+  Application Name: OpenNMS, a SNMP capable web administered Network Management Engine with a PostgresSQL relational backend
+
+  System Requirements:
+
+  Recommended 3 cores, 2G of RAM.
+
+  Setup:
+
+  You may wish to change the PASS variable used by the postgresql container to something other than `verysecretpassword`
+
+  The opennms container is acting as both the tomcat web server as well as the network discovery and data polling collector. These roles really would belong in separate tiers,
+  but the web interface is little more than an administrative interface for the underlying network monitoring engine.
+
+  You may wish to mount a volume for the postgresql container as /data for persistence between restarts.
+
+  The docker hub / github README for [ianblenke/opennms](https://github.com/ianblenke/docker-opennms/) has additional setup instructions that will be helpful.
+
+  Post-Run Instructions:
+
+  Port-Forwarding:
+
+  The external access to this template is through the ports exposed via the ianblenke_opennms node in the Application Balancing tier. By default, port 8980 is exposed.
+
+  For Example: If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rule:
+
+  VboxManage controlvm panamax-vm natpf1 rule,tcp,,8980,,8980 or use the [Panamax wiki page instructions](https://github.com/CenturyLinkLabs/panamax-ui/wiki/How-To%3A-Port-Forwarding-on-VirtualBox)
+
+  The web interface will then be presented at [http://localhost:8980](http://localhost:8980). The default username ("admin") and password ("admin") are the OpenNMS defaults.
+
+  Resources:
+
+  The [ianblenke/docker-opennms](https://github.com/ianblenke/docker-opennms) github repository is a great resource for this template.
+
+  Additionally, the [ianblenke/opennms](https://registry.hub.docker.com/builds/github/ianblenke/opennms/) docker hub automatic build repository will show newer builds as they occur.
+images:
+- name: ianblenke_opennms
+  source: ianblenke/opennms:latest
+  category: Application Tier
+  type: Tomcat
+  expose:
+  - '8980'
+  ports:
+  - host_port: '8980'
+    container_port: '8980'
+    proto: TCP
+  links:
+  - service: opennms_postgresql
+    alias: db
+- name: opennms_postgresql
+  source: paintedfox/postgresql:latest
+  category: Database Tier
+  type: Default
+  expose:
+  - '5432'
+  environment:
+  - variable: USER
+    value: postgres
+  - variable: PASS
+    value: verysecretpassword
+  - variable: DB
+    value: opennms

@@ -4,11 +4,21 @@ description: Run a minecraft server with Panamax
 keywords: minecraft
 type: Default
 documentation: |-
-  Minecraft Server
-
+  Standard Minecraft Server, via Panamax!
+  =========
+  
+  ##Instructions
+  No environment variables need to be set, but you can update the MOTD variable to whatever message you'd like to greet players with when they connect to your server.
+  
+  ##System Requirements
   Run with at least 1 gb of memory.
 
-  Make sure to expose and forward port 25565.
+  ##Port Forwarding
+  Make sure to expose and forward port 25565. This is the standard minecraft server port, and will need to be publicly-accessible for players to access your server.
+  
+  ##Verification
+  To test that your server is up-and-running correctly, just enter your container host's IP into Minecraft's "Add a Server" screen. Then connect and play!
+  
 images:
 - name: itzg_minecraft-server_latest
   source: itzg/minecraft-server:latest
