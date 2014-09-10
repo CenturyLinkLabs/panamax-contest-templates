@@ -38,17 +38,22 @@ documentation: |-
   ### Port-Forwarding
 
   If using Virtual Box, use the following command in your local machine's terminal window to create the port forwarding rules:
+  (9200:9200 is for ElasticSearch
+  80:80 is from Grafana
+  8086:8086 is for InfluxDB
+  8888:8080 is for Panamax)
+  
   ```
-  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8888,,8080
+  VBoxManage controlvm panamax-vm natpf1 keystone1,tcp,,8888,,8080
   ```
   ```
-  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,80,,80
+  VBoxManage controlvm panamax-vm natpf1 keystone2,tcp,,80,,80
   ```
   ```
-  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,9200,,9200
+  VBoxManage controlvm panamax-vm natpf1 keystone3,tcp,,9200,,9200
   ```
   ```
-  VBoxManage controlvm panamax-vm natpf1 keystone,tcp,,8086,,8086
+  VBoxManage controlvm panamax-vm natpf1 keystone4,tcp,,8086,,8086
   ```
 
   Rule below is only required if you want to access InfluxDB web interface:
