@@ -76,32 +76,8 @@ images:
   source: metakungfu/locomotive-cms:2.4.1
   category: WEB
   type: Default
-  links:
-  - service: mongo
-    alias: mongodb
-  - service: tutum_memcached
-    alias: memcached
-  environment:
-  - variable: SENDGRID_USERNAME
-    value: foo
-  - variable: SENDGRID_PASSWORD
-    value: bar
-  - variable: SENDGRID_DOMAIN
-    value: domain
-  - variable: S3_KEY_ID
-    value: key
-  - variable: S3_SECRET_KEY
-    value: secret
-  - variable: S3_BUCKET
-    value: assets
-  - variable: S3_BUCKET_REGION
-    value: eu-west-1
-  - variable: MEMCACHED_PASS
-    value: password
-- name: metakungfu_locomotive-cms_2
-  source: metakungfu/locomotive-cms:2.4.1
-  category: WEB
-  type: Default
+  expose:
+  - '80'
   links:
   - service: mongo
     alias: mongodb
@@ -128,6 +104,45 @@ images:
   source: mongo:latest
   category: STORAGE
   type: Default
+  expose:
+  - '27017'
+- name: tutum_memcached
+  source: tutum/memcached:latest
+  category: STORAGE
+  type: Default
+  expose:
+  - '11211'
+  environment:
+  - variable: MEMCACHED_PASS
+    value: password
+- name: metakungfu_locomotive-cms_2
+  source: metakungfu/locomotive-cms:2.4.1
+  category: WEB
+  type: Default
+  expose:
+  - '80'
+  links:
+  - service: mongo
+    alias: mongodb
+  - service: tutum_memcached
+    alias: memcached
+  environment:
+  - variable: SENDGRID_USERNAME
+    value: foo
+  - variable: SENDGRID_PASSWORD
+    value: bar
+  - variable: SENDGRID_DOMAIN
+    value: domain
+  - variable: S3_KEY_ID
+    value: key
+  - variable: S3_SECRET_KEY
+    value: secret
+  - variable: S3_BUCKET
+    value: assets
+  - variable: S3_BUCKET_REGION
+    value: eu-west-1
+  - variable: MEMCACHED_PASS
+    value: password
 - name: wizardapps_ngrok
   source: wizardapps/ngrok:latest
   category: PROXY
@@ -144,6 +159,8 @@ images:
   source: tutum/haproxy:latest
   category: PROXY
   type: Default
+  expose:
+  - '80'
   ports:
   - host_port: '80'
     container_port: '80'
@@ -153,12 +170,3 @@ images:
     alias: metakungfu_locomotive-cms_1
   - service: metakungfu_locomotive-cms_2
     alias: metakungfu_locomotive-cms_2
-- name: tutum_memcached
-  source: tutum/memcached:latest
-  category: STORAGE
-  type: Default
-  expose:
-  - '11211'
-  environment:
-  - variable: MEMCACHED_PASS
-    value: password
