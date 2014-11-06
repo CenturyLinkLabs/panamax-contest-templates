@@ -157,6 +157,8 @@ images:
   source: tutum/memcached:latest
   category: STORAGE
   type: Default
+  expose:
+  - '11211'
   environment:
   - variable: MEMCACHED_PASS
     value: password
