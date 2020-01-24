@@ -18,6 +18,10 @@ This repository will likely be emptied after the contest. If you make a template
 
 _**The contest submission period has ended. Part 2 (a.k.a. "Shamelessly promote your template") begins Tuesday September 2nd.**_
 
+## NOTE
+
+This repo is no longer being maintained. Users are welcome to fork it, but we make no warranty of its functionality.
+
 ## How to Submit a Contest Entry
 1. Install Panamax using the directions from  http://panamax.io/get-panamax
 2. Create the best template you can think of, using the guidelines listed in the documentation at  http://panamax.io/documentation
